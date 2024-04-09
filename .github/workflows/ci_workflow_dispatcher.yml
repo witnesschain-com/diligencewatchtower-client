@@ -1,0 +1,15 @@
+name: Continuous Integration - Workflow Dispatcher
+
+on:
+  pull_request:
+    
+
+jobs:
+  workflow-call-watchtower:
+    name: Check for watchtower client - 🗼
+    if: contains( github.event.pull_request.labels.*.name, 'watchtower')
+    uses: ./.github/workflows/dispatch_watchtower.yml
+  workflow-call-smartcontracts:
+    name: Check for smart contracts - 📜
+    if: contains( github.event.pull_request.labels.*.name, 'contracts')
+    uses: ./.github/workflows/dispatch_smartcontracts.yml

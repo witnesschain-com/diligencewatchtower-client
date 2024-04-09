@@ -1,0 +1,49 @@
+name: push reward bounty binaries to watchtower repo
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build:
+    env:
+      client-directory: ./src/smart_contracts/script/rewardBounty
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.5'
+
+    - name: Build
+      working-directory: ${{env.client-directory}}
+      run: go build -o ./output/callRewardBounty
+
+    - name: Copy rewardBounty.sh to output
+      working-directory: ${{env.client-directory}}
+      run: cp ./reward_bounty.sh ./output/reward_bounty.sh
+
+    - name: Copy README.md to output
+      working-directory: ${{env.client-directory}}
+      run: cp ./README.md ./output/README.md
+
+    - name: Tar + gzip binaries
+      working-directory: ${{env.client-directory}}/output
+      run: tar czvf rewardBounty.tar.gz callRewardBounty reward_bounty.sh README.md
+
+    - name: Only keep zip file to push
+      working-directory: ${{env.client-directory}}/output
+      run: rm ./reward_bounty.sh ./callRewardBounty ./README.md
+
+    - name: Pushes to watchtower repository
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.WATCHTOWER_REPO_ACCESS_TOKEN }}
+      with:
+        source-directory: '${{env.client-directory}}/output'
+        target-directory: 'rewardBounty'
+        destination-github-username: 'kaleidoscope-blockchain'
+        destination-repository-name: 'watchtower'
+        user-email: actions@github.com
+        target-branch: main

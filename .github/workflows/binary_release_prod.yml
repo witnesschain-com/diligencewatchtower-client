@@ -1,0 +1,130 @@
+name: CD - Binary Release
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: Version of the release (eg. 1.0.0-beta, 1.1.2)
+        required: true
+      release_type:
+        type: boolean
+        description: Pre-release
+        default: false
+
+env:
+  WATCHTOWER_DIR: ./src/client
+  REWARDBOUNTY_DIR: ./src/smart_contracts/script/rewardBounty
+jobs:
+  upload-releasenotes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+            name: release_notes
+            path: ./RELEASE.md
+
+  build-watchtower:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+    
+      - name: Build
+        working-directory: ${{ env.WATCHTOWER_DIR }}
+        run: go build .
+    
+      - name: List Output
+        run: ls -ltr ${{ env.WATCHTOWER_DIR }}
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: watchtower_bin
+          path: ${{ env.WATCHTOWER_DIR }}/watchtower
+          retention-days: 1
+
+
+  build-rewardBounty:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.5'
+    
+      - name: Build
+        working-directory: ${{ env.REWARDBOUNTY_DIR }}
+        run: go build .
+    
+      - name: List Output
+        run: ls -ltr ${{ env.REWARDBOUNTY_DIR }}
+    
+      - name: Tarball binary & helper script
+        working-directory: ${{ env.REWARDBOUNTY_DIR }}
+        run: tar czvf rewardBounty.tar.gz callRewardBounty reward_bounty.sh
+    
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: rewardBounty_bin
+          path: ${{ env.REWARDBOUNTY_DIR }}/rewardBounty.tar.gz
+          retention-days: 1
+
+
+  create-public-release:
+    needs: 
+      - build-watchtower
+      - build-rewardBounty
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v3
+
+
+      - name: GH Release | Manual 
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          repository: kaleidoscope-blockchain/watchtower
+          token: ${{ secrets.WATCHTOWER_REPO_ACCESS_TOKEN }}
+          tag_name: ${{ github.event.inputs.tag }}
+          prerelease: ${{ github.event.inputs.release_type }}
+          body_path: ./release_notes/RELEASE.md
+          files: |
+            ./watchtower_bin/watchtower
+            ./rewardBounty_bin/rewardBounty.tar.gz
+      
+      -
+        name: Test log release version
+        if: ${{ github.event_name == 'release' }}
+        id: version_tag
+        run: |
+          full_tag_name=${{ github.event.release.tag_name }}
+          tag_without_v=${full_tag_name#"v"}
+          echo "release_tag=${tag_without_v}" >> $GITHUB_OUTPUT
+
+      - name: GH Release | Automated 
+        if: ${{ github.event_name == 'release' }}
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          repository: kaleidoscope-blockchain/watchtower
+          token: ${{ secrets.WATCHTOWER_REPO_ACCESS_TOKEN }}
+          tag_name: ${{ steps.version_tag.outputs.release_tag }}
+          prerelease: ${{ github.event.release.prerelease}}
+          body_path: ./release_notes/RELEASE.md
+          files: |
+            ./watchtower_bin/watchtower
+            ./rewardBounty_bin/rewardBounty.tar.gz
