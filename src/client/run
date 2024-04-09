@@ -1,0 +1,48 @@
+#!/bin/sh
+
+SUDO="sudo"
+
+$SUDO 2>/dev/null
+
+if [ "$?" = "127" ] # command sudo NOT found
+then
+	SUDO=""
+fi
+
+while :
+do
+	host_name=`cat config.json  | grep host_name | cut -f4 -d'"'`
+
+	if [ "$host_name" != "" ]
+	then
+		$SUDO cp /etc/letsencrypt/live/$host_name/privkey.pem	https-privkey.pem
+		$SUDO cp /etc/letsencrypt/live/$host_name/fullchain.pem	https-fullchain.pem
+
+		uid=`id -u`
+		gid=`id -g`
+
+		$SUDO chown $uid:$gid https-privkey.pem
+
+		chmod 400 https-privkey.pem
+	fi
+
+	if [ -e "./watchtower" ]
+	then
+		./watchtower
+	else
+		go run .
+	fi
+
+	if [ "$?" = "123" ] # some error
+	then
+		alert_url=`cat config.json | grep watchtower_failure_alert_url | cut -f4 -d'"'`
+
+		if [ "$alert_url" != "" ]
+		then
+			echo curl -v -d "'{\"error\":\"unknown\"}'" "'$alert_url'"
+			curl -d "'{\"error\":\"unknown\"}'" "$alert_url"
+		fi
+	fi
+
+	sleep 2
+done

@@ -1,0 +1,431 @@
+[
+    {
+      "stateMutability": "nonpayable",
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "_submissionInterval",
+          "internalType": "uint256",
+          "type": "uint256"
+        },
+        {
+          "name": "_l2BlockTime",
+          "internalType": "uint256",
+          "type": "uint256"
+        },
+        {
+          "name": "_startingBlockNumber",
+          "internalType": "uint256",
+          "type": "uint256"
+        },
+        {
+          "name": "_startingTimestamp",
+          "internalType": "uint256",
+          "type": "uint256"
+        },
+        {
+          "name": "_proposer",
+          "internalType": "address",
+          "type": "address"
+        },
+        {
+          "name": "_challenger",
+          "internalType": "address",
+          "type": "address"
+        },
+        {
+          "name": "_finalizationPeriodSeconds",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "version",
+          "internalType": "uint8",
+          "type": "uint8",
+          "indexed": false
+        }
+      ],
+      "name": "Initialized"
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "outputRoot",
+          "internalType": "bytes32",
+          "type": "bytes32",
+          "indexed": true
+        },
+        {
+          "name": "l2OutputIndex",
+          "internalType": "uint256",
+          "type": "uint256",
+          "indexed": true
+        },
+        {
+          "name": "l2BlockNumber",
+          "internalType": "uint256",
+          "type": "uint256",
+          "indexed": true
+        },
+        {
+          "name": "l1Timestamp",
+          "internalType": "uint256",
+          "type": "uint256",
+          "indexed": false
+        }
+      ],
+      "name": "OutputProposed"
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "prevNextOutputIndex",
+          "internalType": "uint256",
+          "type": "uint256",
+          "indexed": true
+        },
+        {
+          "name": "newNextOutputIndex",
+          "internalType": "uint256",
+          "type": "uint256",
+          "indexed": true
+        }
+      ],
+      "name": "OutputsDeleted"
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "CHALLENGER",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "address",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "FINALIZATION_PERIOD_SECONDS",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "L2_BLOCK_TIME",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "PROPOSER",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "address",
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "SUBMISSION_INTERVAL",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_l2BlockNumber",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ],
+      "name": "computeL2Timestamp",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_l2OutputIndex",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ],
+      "name": "deleteL2Outputs",
+      "outputs": []
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_l2OutputIndex",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ],
+      "name": "getL2Output",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "struct Types.OutputProposal",
+          "type": "tuple",
+          "components": [
+            {
+              "name": "outputRoot",
+              "internalType": "bytes32",
+              "type": "bytes32"
+            },
+            {
+              "name": "timestamp",
+              "internalType": "uint128",
+              "type": "uint128"
+            },
+            {
+              "name": "l2BlockNumber",
+              "internalType": "uint128",
+              "type": "uint128"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_l2BlockNumber",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ],
+      "name": "getL2OutputAfter",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "struct Types.OutputProposal",
+          "type": "tuple",
+          "components": [
+            {
+              "name": "outputRoot",
+              "internalType": "bytes32",
+              "type": "bytes32"
+            },
+            {
+              "name": "timestamp",
+              "internalType": "uint128",
+              "type": "uint128"
+            },
+            {
+              "name": "l2BlockNumber",
+              "internalType": "uint128",
+              "type": "uint128"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_l2BlockNumber",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ],
+      "name": "getL2OutputIndexAfter",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_startingBlockNumber",
+          "internalType": "uint256",
+          "type": "uint256"
+        },
+        {
+          "name": "_startingTimestamp",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ],
+      "name": "initialize",
+      "outputs": []
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "latestBlockNumber",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "latestOutputIndex",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "nextBlockNumber",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "nextOutputIndex",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "payable",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "_outputRoot",
+          "internalType": "bytes32",
+          "type": "bytes32"
+        },
+        {
+          "name": "_l2BlockNumber",
+          "internalType": "uint256",
+          "type": "uint256"
+        },
+        {
+          "name": "_l1BlockHash",
+          "internalType": "bytes32",
+          "type": "bytes32"
+        },
+        {
+          "name": "_l1BlockNumber",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ],
+      "name": "proposeL2Output",
+      "outputs": []
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "startingBlockNumber",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "startingTimestamp",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "uint256",
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "stateMutability": "view",
+      "type": "function",
+      "inputs": [],
+      "name": "version",
+      "outputs": [
+        {
+          "name": "",
+          "internalType": "string",
+          "type": "string"
+        }
+      ]
+    }
+  ]

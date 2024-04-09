@@ -1,0 +1,72 @@
+package watcher
+
+import (
+	"crypto/ecdsa"
+	"math/big"
+	"strconv"
+
+	wtCommon "github.com/diligencewatchtower-client/common"
+	"github.com/diligencewatchtower-client/opchain"
+	"github.com/ethereum/go-ethereum/crypto"
+)
+
+func FetchIntermediateStateRoots(
+	config *wtCommon.SimplifiedConfig,
+	ultimateBlockHash string,
+	penultimateBlockHash string,
+
+) (string, string) {
+	wtCommon.Info("Running trace on L2 RPC node ...")
+
+	traceResultUltimate := opchain.TraceBlock(ultimateBlockHash, config)
+	traceResultPenultimate := opchain.TraceBlock(penultimateBlockHash, config)
+
+	wtCommon.Success("Found `" + strconv.Itoa(len(traceResultPenultimate)) + " and " + strconv.Itoa(len(traceResultUltimate)) + "` intermediate state roots")
+
+	midPointPenultimateBlock := traceResultPenultimate[len(traceResultPenultimate)/2]
+	midPointUltimate := traceResultUltimate[len(traceResultUltimate)/2]
+
+	wtCommon.Info("`midPoint` of stateRoots on L2 are ...")
+	wtCommon.Success(midPointPenultimateBlock)
+	wtCommon.Success(midPointUltimate)
+	return midPointPenultimateBlock, midPointUltimate
+}
+
+func ComputeProofOfDiligence(
+	latestBlockNumber *big.Int,
+	midPointPenultimateBlock string,
+	midPointUltimateBlock string,
+
+) []byte {
+
+	version_number := big.NewInt(0)
+	wtCommon.Info("the `version_number` for proof of diligence is")
+	wtCommon.Success(version_number)
+	wtCommon.Info("Computing proof of diligence")
+
+	proofOfDilegence := []byte(latestBlockNumber.String() + "," + midPointPenultimateBlock + "," + midPointUltimateBlock + "," + version_number.String())
+
+	return proofOfDilegence
+}
+
+func SignProofOfDiligence(
+	proofOfDilegence []byte,
+	privateKey *ecdsa.PrivateKey,
+) []byte {
+	hash := crypto.Keccak256Hash(proofOfDilegence)
+
+	prefix := []byte("\x19Ethereum Signed Message:\n32")
+	var hash_bytes []byte = hash.Bytes()
+
+	proofOfDilegenceToHash := append(prefix, hash_bytes...)
+	final_hash := crypto.Keccak256Hash(proofOfDilegenceToHash)
+
+	signatureOfProofOfDiligence, err := crypto.Sign(final_hash.Bytes(), privateKey)
+	if err != nil {
+		wtCommon.Fatal(err)
+	}
+
+	signatureOfProofOfDiligence[64] += 27 // XXX legacy reasons!
+	wtCommon.Success("Successfully signed Proof of Diligence")
+	return signatureOfProofOfDiligence
+}

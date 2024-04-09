@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -- 
+
+GOSEC_PATH="$HOME/Downloads/gosec_2.18.2_darwin_arm64/"
+STATICCHECK_PATH="$HOME/Downloads/staticcheck/"
+GOLANG_LINT_PATH="$HOME/Downloads/golangci-lint-1.55.2-darwin-arm64/"
+
+set -- "$@" "${GOSEC_PATH}gosec ./..."
+set -- "$@" "${STATICCHECK_PATH}staticcheck ./..."
+set -- "$@" "${GOLANG_LINT_PATH}golangci-lint run --enable-all --fix ./..."
+
+while [ "$1" != "" ]
+do
+	tool=`echo $1 | cut -f1 -d' ' | tr '/' '\n' | tail -n1`
+	echo "===== START of '$tool'"
+
+	$1 2>/dev/null
+	
+	if [ "$?" = "0" ]
+	then
+		echo "\t\t\x1B[32mNo errors\x1B[0m"
+	fi
+
+	echo "===== END * of '$tool'\n"
+
+	shift
+done
