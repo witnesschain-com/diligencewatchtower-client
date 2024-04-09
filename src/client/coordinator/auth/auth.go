@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/publicsuffix"
 
 	wtCommon "github.com/diligencewatchtower-client/common"
-	coordCfg "github.com/diligencewatchtower-client/watchtower/coordinator/configuration"
+	coordCfg "github.com/diligencewatchtower-client/coordinator/configuration"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )

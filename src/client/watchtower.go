@@ -19,9 +19,9 @@ import (
 	"github.com/Layr-Labs/eigensdk-go/nodeapi"
 
 	wtCommon "github.com/diligencewatchtower-client/common"
+	coordinator "github.com/diligencewatchtower-client/coordinator"
 	"github.com/diligencewatchtower-client/external"
 	"github.com/diligencewatchtower-client/watcher"
-	coordinator "github.com/diligencewatchtower-client/watchtower/coordinator"
 	"github.com/diligencewatchtower-client/webserver"
 )
 
