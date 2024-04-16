@@ -4,7 +4,7 @@ package contractutils
 // "math/big"
 // "testing"
 
-// wtCommon "github.com/diligencewatchtower-client/common"
+// wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 
 // Can only submit proof for the latest block number
 // func TestSubmitProofToDiligenceProofManager(t *testing.T){

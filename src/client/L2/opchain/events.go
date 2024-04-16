@@ -14,7 +14,7 @@ import (
 	"context"
 	"time"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/core/types"

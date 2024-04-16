@@ -1,4 +1,4 @@
-module github.com/diligencewatchtower-client/bindings
+module github.com/witnesschain-com/diligencewatchtower-client/bindings
 
 go 1.20
 

@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"testing"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 func TestParseOutputProposed(t *testing.T) {

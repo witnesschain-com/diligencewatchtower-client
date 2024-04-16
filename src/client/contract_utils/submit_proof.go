@@ -6,8 +6,8 @@ import (
 
 	"math/big"
 
-	"github.com/diligencewatchtower-client/bindings"
-	wtCommon "github.com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/bindings"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/core/types"

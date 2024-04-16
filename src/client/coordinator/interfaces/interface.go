@@ -3,9 +3,9 @@ package interfaces
 import (
 	"fmt"
 
-	datatypes "github.com/diligencewatchtower-client/coordinator/Datatypes"
-	"github.com/diligencewatchtower-client/opchain"
-	"github.com/diligencewatchtower-client/watcher"
+	datatypes "github.com/witnesschain-com/diligencewatchtower-client/coordinator/Datatypes"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
+	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
 )
 
 func TraceTransaction(transactionHash string, deps datatypes.TracerDependencies) datatypes.TraceTxnResult {

@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"testing"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 func TestProcessIntermediateBlocks(t *testing.T) {

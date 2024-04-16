@@ -13,10 +13,10 @@ import (
 
 	"github.com/jellydator/ttlcache/v3"
 
-	"github.com/diligencewatchtower-client/bindings"
-	wtCommon "github.com/diligencewatchtower-client/common"
-	"github.com/diligencewatchtower-client/contractutils"
-	"github.com/diligencewatchtower-client/opchain"
+	"github.com/witnesschain-com/diligencewatchtower-client/bindings"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
 // starts the txn inclusion watcher component of the watchtower

@@ -5,8 +5,8 @@ import (
 
 	"github.com/Layr-Labs/eigensdk-go/logging"
 	"github.com/Layr-Labs/eigensdk-go/metrics"
-	wtCommon "github.com/diligencewatchtower-client/common"
 	"github.com/prometheus/client_golang/prometheus"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 func InitialiseELMonitoring() {

@@ -1,9 +1,9 @@
 package common
 
 import (
-	"github.com/diligencewatchtower-client/bindings"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/bindings"
 )
 
 // Check if we are eigen-layer operator
