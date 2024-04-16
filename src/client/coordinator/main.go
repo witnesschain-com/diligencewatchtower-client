@@ -7,14 +7,14 @@ import (
 	"sync"
 	"time"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
-	datatypes "github.com/diligencewatchtower-client/coordinator/Datatypes"
-	auth "github.com/diligencewatchtower-client/coordinator/auth"
-	ws "github.com/diligencewatchtower-client/coordinator/core"
-	wtInterface "github.com/diligencewatchtower-client/coordinator/interfaces"
-	watcher "github.com/diligencewatchtower-client/watcher"
 	"github.com/gorilla/websocket"
 	"github.com/jellydator/ttlcache/v3"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	datatypes "github.com/witnesschain-com/diligencewatchtower-client/coordinator/Datatypes"
+	auth "github.com/witnesschain-com/diligencewatchtower-client/coordinator/auth"
+	ws "github.com/witnesschain-com/diligencewatchtower-client/coordinator/core"
+	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/coordinator/interfaces"
+	watcher "github.com/witnesschain-com/diligencewatchtower-client/watcher"
 )
 
 type Counter struct {

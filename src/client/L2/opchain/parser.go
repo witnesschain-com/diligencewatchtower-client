@@ -13,8 +13,8 @@ package opchain
 import (
 	"encoding/hex"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 // Parses output proposed event log on L2OO

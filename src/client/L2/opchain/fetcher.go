@@ -17,8 +17,8 @@ import (
 	"strconv"
 	"time"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
 	"github.com/ethereum/go-ethereum/rpc"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 
 	"encoding/json"
 	"io/ioutil"

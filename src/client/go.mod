@@ -1,4 +1,4 @@
-module github.com/diligencewatchtower-client
+module github.com/witnesschain-com/diligencewatchtower-client
 
 go 1.20
 
@@ -9,11 +9,11 @@ require (
 	github.com/gorilla/websocket v1.5.1
 	github.com/jellydator/ttlcache/v3 v3.1.1
 	golang.org/x/net v0.18.0
-	github.com/diligencewatchtower-client/common v0.0.0-00010101000000-000000000000
-	github.com/diligencewatchtower-client/external v0.0.0-00010101000000-000000000000
-	github.com/diligencewatchtower-client/opchain v0.0.0-00010101000000-000000000000
-	github.com/diligencewatchtower-client/watcher v0.0.0-00010101000000-000000000000
-	github.com/diligencewatchtower-client/webserver v0.0.0-00010101000000-000000000000
+	github.com/witnesschain-com/diligencewatchtower-client/common v0.0.0-00010101000000-000000000000
+	github.com/witnesschain-com/diligencewatchtower-client/external v0.0.0-00010101000000-000000000000
+	github.com/witnesschain-com/diligencewatchtower-client/opchain v0.0.0-00010101000000-000000000000
+	github.com/witnesschain-com/diligencewatchtower-client/watcher v0.0.0-00010101000000-000000000000
+	github.com/witnesschain-com/diligencewatchtower-client/webserver v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -56,25 +56,25 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
-	github.com/diligencewatchtower-client/L1 v0.0.0-00010101000000-000000000000 // indirect
-	github.com/diligencewatchtower-client/bindings v0.0.0-00010101000000-000000000000 // indirect
-	github.com/diligencewatchtower-client/contractutils v0.0.0-00010101000000-000000000000 // indirect
+	github.com/witnesschain-com/diligencewatchtower-client/L1 v0.0.0-00010101000000-000000000000 // indirect
+	github.com/witnesschain-com/diligencewatchtower-client/bindings v0.0.0-00010101000000-000000000000 // indirect
+	github.com/witnesschain-com/diligencewatchtower-client/contractutils v0.0.0-00010101000000-000000000000 // indirect
 )
 
-replace github.com/diligencewatchtower-client/L1 => ./L1
+replace github.com/witnesschain-com/diligencewatchtower-client/L1 => ./L1
 
-replace github.com/diligencewatchtower-client/common => ./common
+replace github.com/witnesschain-com/diligencewatchtower-client/common => ./common
 
-replace github.com/diligencewatchtower-client/contractutils => ./contract_utils
+replace github.com/witnesschain-com/diligencewatchtower-client/contractutils => ./contract_utils
 
-replace github.com/diligencewatchtower-client/bindings => ./bindings
+replace github.com/witnesschain-com/diligencewatchtower-client/bindings => ./bindings
 
-replace github.com/diligencewatchtower-client/webserver => ./webserver
+replace github.com/witnesschain-com/diligencewatchtower-client/webserver => ./webserver
 
-replace github.com/diligencewatchtower-client/opchain => ./L2/opchain
+replace github.com/witnesschain-com/diligencewatchtower-client/opchain => ./L2/opchain
 
-replace github.com/diligencewatchtower-client/rotation => ./rotation
+replace github.com/witnesschain-com/diligencewatchtower-client/rotation => ./rotation
 
-replace github.com/diligencewatchtower-client/watcher => ./watcher
+replace github.com/witnesschain-com/diligencewatchtower-client/watcher => ./watcher
 
-replace github.com/diligencewatchtower-client/external => ./external
+replace github.com/witnesschain-com/diligencewatchtower-client/external => ./external

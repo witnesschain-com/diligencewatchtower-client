@@ -11,7 +11,7 @@
 package opchain
 
 import (
-	wtCommon "github.com/diligencewatchtower-client/common"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 // returns `true` if output root is valid

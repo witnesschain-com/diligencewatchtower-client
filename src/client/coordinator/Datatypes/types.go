@@ -3,11 +3,11 @@ package datatypes
 import (
 	"crypto/ecdsa"
 
-	"github.com/diligencewatchtower-client/opchain"
-	"github.com/diligencewatchtower-client/watcher"
 	"github.com/jellydator/ttlcache/v3"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
+	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 type WSRequestData struct {

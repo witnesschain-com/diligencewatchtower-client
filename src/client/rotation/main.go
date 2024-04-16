@@ -20,11 +20,11 @@ import (
 
 	// "strconv"
 
-	"github.com/diligencewatchtower-client/bindings"
-	wtCommon "github.com/diligencewatchtower-client/common"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/witnesschain-com/diligencewatchtower-client/bindings"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 type Rollup struct {

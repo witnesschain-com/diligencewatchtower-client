@@ -4,8 +4,8 @@ import (
 	"context"
 	"math/big"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
-	"github.com/diligencewatchtower-client/opchain"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
 func ProcessIntermediateBlocks(

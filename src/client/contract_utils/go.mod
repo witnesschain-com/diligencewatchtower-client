@@ -1,3 +1,3 @@
-module github.com/diligencewatchtower-client/contractutils
+module github.com/witnesschain-com/diligencewatchtower-client/contractutils
 
 go 1.20

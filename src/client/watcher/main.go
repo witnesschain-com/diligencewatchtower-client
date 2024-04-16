@@ -5,9 +5,9 @@ import (
 	"math/big"
 	"strconv"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
-	"github.com/diligencewatchtower-client/opchain"
 	"github.com/ethereum/go-ethereum/crypto"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
 func FetchIntermediateStateRoots(

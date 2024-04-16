@@ -33,7 +33,7 @@ func StartBlock(message string) {
 	from := runtime.FuncForPC(pc).Name()
 
 	if strings.HasPrefix(from, "w") {
-		from = strings.Replace(from, "github.com/diligencewatchtower-client/", "", 1)
+		from = strings.Replace(from, "github.com/witnesschain-com/diligencewatchtower-client/", "", 1)
 	}
 
 	from_length := len(from)
@@ -59,7 +59,7 @@ func EndBlock(message string) {
 	from := runtime.FuncForPC(pc).Name()
 
 	if strings.HasPrefix(from, "w") {
-		from = strings.Replace(from, "github.com/diligencewatchtower-client/", "", 1)
+		from = strings.Replace(from, "github.com/witnesschain-com/diligencewatchtower-client/", "", 1)
 	}
 
 	from_length := len(from)
@@ -85,7 +85,7 @@ func Success(message any) bool {
 	from := runtime.FuncForPC(pc).Name()
 
 	if strings.HasPrefix(from, "w") {
-		from = strings.Replace(from, "github.com/diligencewatchtower-client/", "", 1)
+		from = strings.Replace(from, "github.com/witnesschain-com/diligencewatchtower-client/", "", 1)
 	}
 
 	from_length := len(from)
@@ -113,7 +113,7 @@ func Info(message any) bool {
 	from := runtime.FuncForPC(pc).Name()
 
 	if strings.HasPrefix(from, "w") {
-		from = strings.Replace(from, "github.com/diligencewatchtower-client/", "", 1)
+		from = strings.Replace(from, "github.com/witnesschain-com/diligencewatchtower-client/", "", 1)
 	}
 
 	from_length := len(from)
@@ -141,7 +141,7 @@ func Warning(message any) bool {
 	from := runtime.FuncForPC(pc).Name()
 
 	if strings.HasPrefix(from, "w") {
-		from = strings.Replace(from, "github.com/diligencewatchtower-client/", "", 1)
+		from = strings.Replace(from, "github.com/witnesschain-com/diligencewatchtower-client/", "", 1)
 	}
 
 	from_length := len(from)
@@ -171,7 +171,7 @@ func Error(message any) bool {
 	file = r.ReplaceAllString(file, "${2}") // get rid of first ".*/src/"
 
 	if strings.HasPrefix(from, "w") {
-		from = strings.Replace(from, "github.com/diligencewatchtower-client/", "", 1)
+		from = strings.Replace(from, "github.com/witnesschain-com/diligencewatchtower-client/", "", 1)
 	}
 
 	from_length := len(from)
@@ -209,7 +209,7 @@ func Fatal(message any) bool {
 	from := runtime.FuncForPC(pc).Name()
 
 	if strings.HasPrefix(from, "w") {
-		from = strings.Replace(from, "github.com/diligencewatchtower-client/", "", 1)
+		from = strings.Replace(from, "github.com/witnesschain-com/diligencewatchtower-client/", "", 1)
 	}
 
 	from_length := len(from)

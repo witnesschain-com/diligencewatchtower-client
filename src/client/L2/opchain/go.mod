@@ -1,4 +1,4 @@
-module github.com/diligencewatchtower-client/opchain
+module github.com/witnesschain-com/diligencewatchtower-client/opchain
 
 go 1.20
 

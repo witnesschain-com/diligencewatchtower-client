@@ -18,11 +18,11 @@ import (
 
 	"github.com/Layr-Labs/eigensdk-go/nodeapi"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
-	coordinator "github.com/diligencewatchtower-client/coordinator"
-	"github.com/diligencewatchtower-client/external"
-	"github.com/diligencewatchtower-client/watcher"
-	"github.com/diligencewatchtower-client/webserver"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	coordinator "github.com/witnesschain-com/diligencewatchtower-client/coordinator"
+	"github.com/witnesschain-com/diligencewatchtower-client/external"
+	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
+	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
 
 const version = "v1.0"

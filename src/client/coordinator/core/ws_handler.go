@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/diligencewatchtower-client/L1
+module github.com/witnesschain-com/diligencewatchtower-client/L1
 
 go 1.20
 

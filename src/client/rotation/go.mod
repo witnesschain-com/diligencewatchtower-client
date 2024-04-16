@@ -1,10 +1,10 @@
-module github.com/diligencewatchtower-client/rotation
+module github.com/witnesschain-com/diligencewatchtower-client/rotation
 
 go 1.18
 
 require (
 	github.com/ethereum/go-ethereum v1.13.4
-	github.com/diligencewatchtower-client/bindings v0.0.0-00010101000000-000000000000
+	github.com/witnesschain-com/diligencewatchtower-client/bindings v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -36,9 +36,9 @@ require (
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
-	github.com/diligencewatchtower-client/common v0.0.0-00010101000000-000000000000 // indirect
+	github.com/witnesschain-com/diligencewatchtower-client/common v0.0.0-00010101000000-000000000000 // indirect
 )
 
-replace github.com/diligencewatchtower-client/bindings => ../bindings
+replace github.com/witnesschain-com/diligencewatchtower-client/bindings => ../bindings
 
-replace github.com/diligencewatchtower-client/common => ../common
+replace github.com/witnesschain-com/diligencewatchtower-client/common => ../common

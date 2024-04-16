@@ -2,7 +2,7 @@ package external
 
 import (
 	"github.com/Layr-Labs/eigensdk-go/logging"
-	wtCommon "github.com/diligencewatchtower-client/common"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 func GetELLogger() logging.Logger {

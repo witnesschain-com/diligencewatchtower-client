@@ -23,7 +23,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	wtCommon "github.com/diligencewatchtower-client/common"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )
 
 var isAlive = false

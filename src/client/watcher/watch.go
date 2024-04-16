@@ -14,10 +14,10 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/diligencewatchtower-client/L1"
-	wtCommon "github.com/diligencewatchtower-client/common"
-	"github.com/diligencewatchtower-client/contractutils"
-	"github.com/diligencewatchtower-client/opchain"
+	"github.com/witnesschain-com/diligencewatchtower-client/L1"
+	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
 var parsed_output *opchain.OutputProposed = nil
