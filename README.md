@@ -33,24 +33,37 @@ To get started with the Watchtower Client, please follow the instructions below
 ### Steps
 1. Clone the repository
 
-    `git clone https://github.com/witnesschain-com/diligencewatchtower-client.git`
+    ```
+    git clone https://github.com/witnesschain-com/diligencewatchtower-client.git
+    ```
 
 2. Move to the `client` directory
 
-    `cd diligencewatchtower-client/sec/client`
+    ```
+    cd diligencewatchtower-client/src/client
+    ```
 
-3. a) build and run the watchtower with the help of the `run` script
+3. Building
+   -  using run script
+      -  build and run the watchtower with the help of the `run` script
 
-    `./run`
+    ```
+    ./run
+    ```
 
-3. b) build the watchtower binary (optional)
+   - using go
+      -  build the watchtower binary (optional)
 
-    `go build .`
+    ```
+    go build -o watchtower .
+    ```
 
-4. running the watchtower here after
+4. Running the watchtower here after
    the watchtower binary should be present in this directory, you can run that by
 
-    `./watchtower`
+    ```
+    ./watchtower
+    ```
 
 
 ## Running the containerised version of WitnessChain Watchtower
@@ -65,16 +78,22 @@ To get started with the Watchtower Client, please follow the instructions below
 
 1. Clone the repository
 
-    `git clone https://github.com/witnesschain-com/diligencewatchtower-client.git`
+    ```
+    git clone https://github.com/witnesschain-com/diligencewatchtower-client.git
+    ```
 
 2. Move to the `client` directory
 
-    `cd diligencewatchtower-client/sec/client`
-    
-    `docker build -t witnesschain/watchtower .`
+    ```
+    cd diligencewatchtower-client/src/client
+
+    docker build -t witnesschain/watchtower .
+    ```
 
 ### Running the image
-`docker run --network host witnesschain/watchtower`
+```
+docker run --network host witnesschain/watchtower
+```
 
 ### Running the image with a config file
 A volume mount can be used to feed the configuration to the app
