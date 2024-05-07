@@ -58,13 +58,13 @@ To get started with the Watchtower Client, please follow the instructions below
     go build -o watchtower .
     ```
 
-4. Running the watchtower here after
-   the watchtower binary should be present in this directory, you can run that by
+4. Running the watchtower: If the watchtower was built via go, you can manually start it with the following command
 
     ```
     ./watchtower
     ```
 
+**Note:** Make sure the `config.json` is filled and present in the directory the watchtower executable is
 
 ## Running the containerised version of WitnessChain Watchtower
 
