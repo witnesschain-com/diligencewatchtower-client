@@ -8,7 +8,7 @@ COPY . ./
 RUN go mod download
 
 
-RUN go build .
+RUN go build -o watchtower .
 RUN chmod +x ./rundocker.sh
 
 FROM debian:stable 
