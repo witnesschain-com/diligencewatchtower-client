@@ -11,11 +11,11 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/jellydator/ttlcache/v3"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
-	watcher "github.com/witnesschain-com/diligencewatchtower-client/watcher"
 	datatypes "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/Datatypes"
 	auth "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/auth"
 	ws "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/core"
 	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/interfaces"
+	watcher "github.com/witnesschain-com/diligencewatchtower-client/watcher"
 	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
 )
 
