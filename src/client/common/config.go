@@ -16,9 +16,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 // WatchTowerConfig is used to store all the configurable parameters
@@ -245,7 +244,7 @@ type SimplifiedConfig struct {
 	Retries                      int
 	ReceiptTimeout               int
 	GasPrice                     int64
-	WatchtowerAddress            common.Address
+	WatchtowerAddress            ethCommon.Address
 	ExternalSignerEndpoint       string
 	Vault                        string
 	PrivateKey                   *ecdsa.PrivateKey
@@ -311,7 +310,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		simpleConfig = new(SimplifiedConfig)
 	}
 
-	simpleConfig.WatchtowerAddress = common.HexToAddress(config.WatchtowerAddress)
+	simpleConfig.WatchtowerAddress = ethCommon.HexToAddress(config.WatchtowerAddress)
 	simpleConfig.AlertManagerAddress = ethCommon.HexToAddress(config.AlertManagerAddress)
 	simpleConfig.DiligenceProofManagerAddress = ethCommon.HexToAddress(config.DiligenceProofManagerAddress)
 	simpleConfig.Retries = config.Retries
