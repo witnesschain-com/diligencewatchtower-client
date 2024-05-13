@@ -1,19 +1,18 @@
-module github.com/witnesschain-com/diligencewatchtower-client
+module github.com/witnesschain-com/diligencewatchtower-client/watchtower
 
 go 1.20
 
 require (
 	github.com/Layr-Labs/eigensdk-go v0.0.8
-	github.com/etaaa/Golang-Ethereum-Personal-Sign v1.0.0
 	github.com/ethereum/go-ethereum v1.13.14
 	github.com/gorilla/websocket v1.5.1
 	github.com/jellydator/ttlcache/v3 v3.1.1
-	golang.org/x/net v0.18.0
 	github.com/witnesschain-com/diligencewatchtower-client/common v0.0.0-00010101000000-000000000000
 	github.com/witnesschain-com/diligencewatchtower-client/external v0.0.0-00010101000000-000000000000
 	github.com/witnesschain-com/diligencewatchtower-client/opchain v0.0.0-00010101000000-000000000000
 	github.com/witnesschain-com/diligencewatchtower-client/watcher v0.0.0-00010101000000-000000000000
 	github.com/witnesschain-com/diligencewatchtower-client/webserver v0.0.0-00010101000000-000000000000
+	golang.org/x/net v0.18.0
 )
 
 require (
@@ -45,6 +44,9 @@ require (
 	github.com/supranational/blst v0.3.11 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
+	github.com/witnesschain-com/diligencewatchtower-client/L1 v0.0.0-00010101000000-000000000000 // indirect
+	github.com/witnesschain-com/diligencewatchtower-client/bindings v0.0.0-00010101000000-000000000000 // indirect
+	github.com/witnesschain-com/diligencewatchtower-client/contractutils v0.0.0-00010101000000-000000000000 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
@@ -56,9 +58,6 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
-	github.com/witnesschain-com/diligencewatchtower-client/L1 v0.0.0-00010101000000-000000000000 // indirect
-	github.com/witnesschain-com/diligencewatchtower-client/bindings v0.0.0-00010101000000-000000000000 // indirect
-	github.com/witnesschain-com/diligencewatchtower-client/contractutils v0.0.0-00010101000000-000000000000 // indirect
 )
 
 replace github.com/witnesschain-com/diligencewatchtower-client/L1 => ./L1

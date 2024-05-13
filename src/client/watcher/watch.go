@@ -14,10 +14,12 @@ import (
 	"strconv"
 	"sync"
 
+	// "github.com/ethereum/go-ethereum/accounts"
 	"github.com/witnesschain-com/diligencewatchtower-client/L1"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
+	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
 )
 
 var parsed_output *opchain.OutputProposed = nil
@@ -31,6 +33,7 @@ var globalConfigData *wtCommon.SimplifiedConfig = nil
 //  1. `L2OO_output`	: parsed event log from L2 output oracle contract
 func do_tracing(
 	L2OO_output *opchain.OutputProposed,
+	vault *keystore.Vault,
 ) bool {
 
 	// get a persistent websocket connection to Submission chain node
@@ -71,10 +74,11 @@ func do_tracing(
 	// sign proof of diligence and get the final Ethereum Signed Message for it
 	signatureOfProofOfDiligence := SignProofOfDiligence(
 		proofOfDilegence,
-		globalConfigData.PrivateKey,
+		globalConfigData.WatchtowerAddress,
+		vault,
 	)
 
-	auth, err := contractutils.GetTransactOpts(globalConfigData, SubmissionChainClient)
+	auth, err := contractutils.GetTransactOpts(globalConfigData, SubmissionChainClient, vault)
 	if err != nil {
 		wtCommon.Error(err)
 	}
@@ -151,6 +155,12 @@ func StartWatcher(
 		wtCommon.Fatal(err)
 	}
 
+	signer, err := 	keystore.SetupVault(globalConfigData)
+
+	if err != nil {
+		wtCommon.Error(err)
+	}
+
 	number_of_retries := 0
 
 	go StartInclusionWatcher(wg, globalConfigData)
@@ -182,7 +192,7 @@ func StartWatcher(
 
 			for number_of_retries < configData.Retries {
 
-				if do_tracing(parsed_output) == true {
+				if do_tracing(parsed_output, signer) == true {
 					number_of_retries = 0
 					parsed_output = nil
 					break
@@ -211,7 +221,7 @@ func StartWatcher(
 
 				parsed_output = opchain.ParseOutputProposed(filteredLog)
 
-				if do_tracing(parsed_output) == true {
+				if do_tracing(parsed_output, signer) == true {
 					wtCommon.Info("Waiting for next proposal ...")
 					parsed_output = nil
 				}

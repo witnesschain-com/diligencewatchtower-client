@@ -19,11 +19,13 @@ import (
 	"github.com/Layr-Labs/eigensdk-go/nodeapi"
 
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
-	coordinator "github.com/witnesschain-com/diligencewatchtower-client/coordinator"
 	"github.com/witnesschain-com/diligencewatchtower-client/external"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
+	coordinator "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator"
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
+
+
 
 const version = "v1.0"
 const sleepTimeIfNoChainAssigned = 5 * time.Second

@@ -7,14 +7,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/gorilla/websocket"
 	"github.com/jellydator/ttlcache/v3"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
-	datatypes "github.com/witnesschain-com/diligencewatchtower-client/coordinator/Datatypes"
-	auth "github.com/witnesschain-com/diligencewatchtower-client/coordinator/auth"
-	ws "github.com/witnesschain-com/diligencewatchtower-client/coordinator/core"
-	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/coordinator/interfaces"
 	watcher "github.com/witnesschain-com/diligencewatchtower-client/watcher"
+	datatypes "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/Datatypes"
+	auth "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/auth"
+	ws "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/core"
+	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/interfaces"
+	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
 )
 
 type Counter struct {
@@ -55,9 +57,10 @@ func getWatchingChainID(cfg wtCommon.WatchTowerConfig) string {
 }
 
 func StartCoordinator(config wtCommon.WatchTowerConfig) {
+	simpleConfig := wtCommon.LoadSimplifiedConfig(&config, nil)
 	client := auth.CoordinatorClient{}
 	if chainId := getWatchingChainID(config); chainId != "" {
-		err := client.Initialize(config.WitnesschainCoordinatorUrl, config.PrivateKey, chainId)
+		err := client.Initialize(config.WitnesschainCoordinatorUrl, common.HexToAddress(config.WatchtowerAddress), chainId, simpleConfig)
 		if err != nil {
 			wtCommon.Error(err)
 			return
@@ -92,18 +95,23 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 	)
 	go cache.Start()
 
-	var simplifiedConfig wtCommon.SimplifiedConfig
-	wtCommon.LoadSimplifiedConfig(&config, &simplifiedConfig)
+
+	Vault, err := keystore.SetupVault(simpleConfig)
+	if err != nil {
+		wtCommon.Error(err)
+	}
 
 	dependencies := datatypes.TracerDependencies{
 		Cache:      cache,
-		Config:     simplifiedConfig,
-		PrivateKey: config.PrivateKey,
+		Config:     *simpleConfig,
+		WatchtowerAddress: common.HexToAddress(config.WatchtowerAddress),
+		Vault: Vault,
+		
 	}
 
 	var DataChannel = make(chan string, 5000)
 
-	go HandleMessages(wsHandler.Connection, DataChannel, dependencies)
+	go HandleMessages(wsHandler.Connection, DataChannel, dependencies, simpleConfig)
 	go Heartbeat(wsHandler.Connection)
 	err = wsHandler.ListenForMessages(DataChannel)
 	wtCommon.Error(err)
@@ -111,9 +119,14 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 
 }
 
-func HandleMessages(connection *websocket.Conn, channel chan string, deps datatypes.TracerDependencies) {
+func HandleMessages(connection *websocket.Conn, channel chan string, deps datatypes.TracerDependencies, config *wtCommon.SimplifiedConfig) {
 	var lastTxn string
 	var lastChainID string
+	signer, err := keystore.SetupVault(config)
+	if err != nil {
+		wtCommon.Error(err)
+	}
+
 	for {
 		data := <-channel
 		wsRequest, err := handleWsJson(data)
@@ -129,7 +142,7 @@ func HandleMessages(connection *websocket.Conn, channel chan string, deps dataty
 			if wsRequest.MessageType == "request" && wsRequest.Api == "trace-transaction" {
 				res := wtInterface.TraceTransaction(wsRequest.TransactionHash, deps)
 				payloadBytes, _ := json.Marshal(res)
-				signature, _ := auth.SignCoordinatorMessage(string(payloadBytes), deps.PrivateKey)
+				signature, _ := auth.SignCoordinatorMessage(string(payloadBytes), deps.WatchtowerAddress, signer)
 
 				coordinatorResp := datatypes.WSTracerResponse{
 					RequestID:       wsRequest.RequestId,

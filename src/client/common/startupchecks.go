@@ -21,14 +21,7 @@ func ValidateWatchtowerAddress(config *WatchTowerConfig) bool {
 	}
 	defer L1Client.Close()
 
-	publicKeyAddress, err := GetPublicKeyAddressFromPrivateKey(config.PrivateKey)
-	if err != nil {
-		Error(err)
-	}
-
-	publicKeyAddressHex := publicKeyAddress.Hex()
-	Info("Your `publicKeyAddressHex` is")
-	Success(publicKeyAddressHex)
+	Success(config.WatchtowerAddress)
 
 	OperatorRegistryAddress := common.HexToAddress(config.OperatorRegistry)
 
@@ -36,7 +29,7 @@ func ValidateWatchtowerAddress(config *WatchTowerConfig) bool {
 	if err != nil {
 		Fatal(err)
 	}
-	isValid, err := operatorRegistryContract.IsValidWatchtower(&callOpts, publicKeyAddress)
+	isValid, err := operatorRegistryContract.IsValidWatchtower(&callOpts, common.HexToAddress(config.WatchtowerAddress))
 	if err != nil {
 		Fatal(err)
 	} else if isValid {

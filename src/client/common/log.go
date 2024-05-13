@@ -226,17 +226,10 @@ func Fatal(message any) bool {
 
 	// send the error if alert url is set
 	currentConfig := LoadConfigFromJson()
-	publicKeyAddressHex := "watchtower eth address not found"
-	publicKeyAddress, err := GetPublicKeyAddressFromPrivateKey(currentConfig.PrivateKey)
-	if err != nil {
-		Error(err)
-	} else {
-		publicKeyAddressHex = publicKeyAddress.Hex()
-	}
 
 	if currentConfig.AlertURL != "" {
 		data, _ := json.Marshal(map[string]interface{}{
-			"watchtower_id": publicKeyAddressHex,
+			"watchtower_id": currentConfig.WatchtowerAddress,
 			"from":          from,
 			"timestamp":     now,
 			"file":          file,

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	WS_URL = "wss://api.witnesschain.com/tracer/v1/watchtower/websocket"
+	WS_URL = "wss://api.github.com/witnesschain-com/diligencewatchtower-client/tracer/v1/watchtower/websocket"
 )
 
 type WebsockerClient struct {

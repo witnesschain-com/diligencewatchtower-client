@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
 )
 
 func SetGasPrice(
@@ -69,34 +70,17 @@ func GetTransactor(
 func GetTransactOpts(
 	config *wtCommon.SimplifiedConfig,
 	SubmissionChainClient *ethclient.Client,
+	vault *keystore.Vault,
 
 ) (*bind.TransactOpts, error) {
 
-	// get eth address associated with watchtower private key stored in the config
-	publicKeyAddress, err := wtCommon.GetPublicKeyAddressFromPrivateKey(config.PrivateKey)
+
+	chainID, err := SubmissionChainClient.ChainID(context.Background())
 	if err != nil {
-		return nil, err
+		wtCommon.Fatal(err)
 	}
 
-	// set gas price for submittign PoD
-	gasPrice := SetGasPrice(config)
-
-	// fetch nonce associated with this watchtower eth address on proof submission chain
-	nonce, err := GetNonce(SubmissionChainClient, publicKeyAddress)
-	if err != nil {
-		return nil, err
-	}
-
-	// prepare transactor object to invoke the transaction as watchtower
-	auth, err := GetTransactor(
-		config.PrivateKey,
-		config.ProofSubmissionChainID,
-		nonce,
-		gasPrice,
-	)
-	if err != nil {
-		return nil, err
-	}
+	auth := vault.NewTransactOpts(chainID)
 
 	return auth, nil
 }

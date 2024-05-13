@@ -1,13 +1,13 @@
 package watcher
 
 import (
-	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
 	"math/big"
 	"sync"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
@@ -17,6 +17,7 @@ import (
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
+	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
 )
 
 // starts the txn inclusion watcher component of the watchtower
@@ -39,6 +40,13 @@ func StartInclusionWatcher(
 		wtCommon.Error(err)
 	}
 	defer SubmissionChainClient.Close()
+
+
+	vault, err := keystore.SetupVault(config)
+
+	if err != nil {
+		wtCommon.Error(err)
+	}
 
 	var inclusionProofBatch InclusionProofBatch
 
@@ -83,7 +91,7 @@ func StartInclusionWatcher(
 				blockReceipts := FetchBlockTxnReceipts(config, newBlock.Hash().Hex())
 
 				// signs each txn receipt and caches them
-				_ = SignAndCacheReceiptBatch(blockReceipts, config.PrivateKey, cache)
+				_ = SignAndCacheReceiptBatch(blockReceipts, config.WatchtowerAddress, vault, cache)
 
 				// get receipt root hash for signing block PoI
 				wtCommon.Info("Getting receipt trie root hash ...")
@@ -96,8 +104,8 @@ func StartInclusionWatcher(
 
 						inclusionProofMerkleRoot := inclusionProofBatch.getRootHash()
 						inclusionProofSubmissionStructure := GeneratePoISubmissionBatchInclusionProof(newBlock.Number, inclusionProofMerkleRoot)
-						signedInclusionProofSubmissionStructure := SignProofOfInclusion(inclusionProofSubmissionStructure, config.PrivateKey)
-						auth, err := contractutils.GetTransactOpts(config, SubmissionChainClient)
+						signedInclusionProofSubmissionStructure := SignProofOfInclusion(inclusionProofSubmissionStructure, config.WatchtowerAddress, vault)
+						auth, err := contractutils.GetTransactOpts(config, SubmissionChainClient, vault)
 						if err != nil {
 							wtCommon.Error(err)
 						}
@@ -122,7 +130,7 @@ func StartInclusionWatcher(
 				)
 
 				// sign the block level PoI
-				_ = SignProofOfInclusion(PoI, config.PrivateKey)
+				_ = SignProofOfInclusion(PoI, config.WatchtowerAddress, vault)
 
 				wtCommon.EndBlock("New L2 block found")
 
@@ -204,6 +212,7 @@ func FetchBlockTxnReceipts(
 func GetProofOfInclusion(
 	txnHashBatch []string,
 	config *wtCommon.SimplifiedConfig,
+	vault *keystore.Vault,
 	cache *ttlcache.Cache[string, InclusionProof],
 
 ) []InclusionProof {
@@ -222,7 +231,7 @@ func GetProofOfInclusion(
 	}
 
 	batchReceipts := opchain.FetchTxnBatchReceipts(queryBatch, config)
-	signedReceipts := SignAndCacheReceiptBatch(batchReceipts, config.PrivateKey, nil)
+	signedReceipts := SignAndCacheReceiptBatch(batchReceipts, config.WatchtowerAddress, vault ,nil)
 
 	for i, POI := range signedReceipts {
 		inclusionProofs[queryMapping[i]] = POI
@@ -233,34 +242,27 @@ func GetProofOfInclusion(
 
 func SignProofOfInclusion(
 	proofOfInclusion []byte,
-	privateKey *ecdsa.PrivateKey,
+	watchtower common.Address,
+	vault *keystore.Vault,
 ) []byte {
 
-	prefix := []byte("\x19Ethereum Signed Message:\n32")
 	hash := crypto.Keccak256Hash(proofOfInclusion)
 
-	var hash_bytes []byte = hash.Bytes()
-
-	proofOfInclusionToHash := append(prefix, hash_bytes...)
-	wtCommon.Info("Signing the Proof of Inclusion")
-	final_hash := crypto.Keccak256Hash(proofOfInclusionToHash)
-
-	wtCommon.Success(final_hash)
-
 	wtCommon.Info("Signing Proof of Inclusion")
-	signatureOfProofOfInclusion, err := crypto.Sign(final_hash.Bytes(), privateKey)
+
+
+	signature, err := vault.SignData(hash.Bytes())
 	if err != nil {
-		wtCommon.Fatal(err)
+		wtCommon.Error(err)
 	}
 
-	signatureOfProofOfInclusion[64] += 27 // XXX legacy reasons!
-	wtCommon.Success("Successfully signed Proof of Inclusion")
-	return signatureOfProofOfInclusion
+	return signature
 }
 
 func SignAndCacheReceiptBatch(
 	receipts []opchain.TransactionReceipt,
-	privateKey *ecdsa.PrivateKey,
+	watchtower common.Address,
+	vault *keystore.Vault,
 	cache *ttlcache.Cache[string, InclusionProof],
 ) []InclusionProof {
 
@@ -273,7 +275,7 @@ func SignAndCacheReceiptBatch(
 			wtCommon.Warning(fmt.Sprintf("%+v", receipts[index]))
 			marshalledReceipt = []byte("")
 		}
-		signedReceipt := SignProofOfInclusion(marshalledReceipt, privateKey)
+		signedReceipt := SignProofOfInclusion(marshalledReceipt, watchtower, vault)
 		SignedPoI := InclusionProof{receipts[index], signedReceipt}
 		if cache != nil {
 			cache.Set(receipts[index].TxHash.Hex(), SignedPoI, ttlcache.DefaultTTL)
