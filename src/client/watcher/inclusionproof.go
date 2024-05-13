@@ -17,7 +17,7 @@ import (
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
-	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
 
 // starts the txn inclusion watcher component of the watchtower

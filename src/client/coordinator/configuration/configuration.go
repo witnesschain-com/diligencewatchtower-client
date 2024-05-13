@@ -2,7 +2,7 @@ package configuration
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
 
 type CoordinatorConfiguration struct {

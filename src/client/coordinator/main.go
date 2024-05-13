@@ -11,12 +11,12 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/jellydator/ttlcache/v3"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
-	datatypes "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/Datatypes"
-	auth "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/auth"
-	ws "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/core"
-	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/interfaces"
+	datatypes "github.com/witnesschain-com/diligencewatchtower-client/coordinator/Datatypes"
+	auth "github.com/witnesschain-com/diligencewatchtower-client/coordinator/auth"
+	ws "github.com/witnesschain-com/diligencewatchtower-client/coordinator/core"
+	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/coordinator/interfaces"
 	watcher "github.com/witnesschain-com/diligencewatchtower-client/watcher"
-	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
 
 type Counter struct {

@@ -21,7 +21,7 @@ import (
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/external"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
-	coordinator "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator"
+	coordinator "github.com/witnesschain-com/diligencewatchtower-client/coordinator"
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
 

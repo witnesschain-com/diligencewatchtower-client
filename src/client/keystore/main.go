@@ -6,7 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/third_party/web3signer"
+	"github.com/witnesschain-com/diligencewatchtower-client/third_party/web3signer"
 
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )

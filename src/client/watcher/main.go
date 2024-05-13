@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
-	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
 
 func FetchIntermediateStateRoots(

@@ -29,13 +29,14 @@ func ValidateWatchtowerAddress(config *WatchTowerConfig) bool {
 	if err != nil {
 		Fatal(err)
 	}
-	isValid, err := operatorRegistryContract.IsValidWatchtower(&callOpts, common.HexToAddress(config.WatchtowerAddress))
+	simplifiedConfig := LoadSimplifiedConfig(config, nil)
+	isValid, err := operatorRegistryContract.IsValidWatchtower(&callOpts, simplifiedConfig.WatchtowerAddress)
 	if err != nil {
 		Fatal(err)
 	} else if isValid {
-		Success("Watchtower address is valid")
+		Success("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() + " is not registered with WitnessChain, please register ")
 	} else {
-		Error("Watchtower address is invalid, please ensure that your watchtower's eth address is registered with WitnessChain")
+		Error("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() +  "address is invalid, please ensure that your watchtower's eth address is registered with WitnessChain")
 		return false
 	}
 

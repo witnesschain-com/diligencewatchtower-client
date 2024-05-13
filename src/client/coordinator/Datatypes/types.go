@@ -5,7 +5,7 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
-	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 )

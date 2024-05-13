@@ -6,7 +6,7 @@ test: test-watcher test-opchain test-contractutils
 
 test-rotation: 
 	docker run --rm --detach --name foundry  ghcr.io/foundry-rs/foundry:latest anvil --broadcast --fork-url ${L1RPC} 
-	-go test -v github.com/witnesschain-com/diligencewatchtower-client/watchtower/rotation
+	-go test -v github.com/witnesschain-com/diligencewatchtower-client/rotation
 	docker stop foundry
 
 test-watcher:

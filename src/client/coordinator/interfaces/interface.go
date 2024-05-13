@@ -5,7 +5,7 @@ import (
 
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
-	datatypes "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/Datatypes"
+	datatypes "github.com/witnesschain-com/diligencewatchtower-client/coordinator/Datatypes"
 )
 
 func TraceTransaction(transactionHash string, deps datatypes.TracerDependencies) datatypes.TraceTxnResult {

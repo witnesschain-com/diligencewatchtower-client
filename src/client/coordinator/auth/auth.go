@@ -13,8 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
-	coordCfg "github.com/witnesschain-com/diligencewatchtower-client/watchtower/coordinator/configuration"
-	"github.com/witnesschain-com/diligencewatchtower-client/watchtower/keystore"
+	coordCfg "github.com/witnesschain-com/diligencewatchtower-client/coordinator/configuration"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
 
 type CoordinatorClient struct {
