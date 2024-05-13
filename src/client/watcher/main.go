@@ -53,7 +53,7 @@ func ComputeProofOfDiligence(
 func SignProofOfDiligence(
 	proofOfDilegence []byte,
 	watchtower common.Address,
-	signer *keystore.Vault,
+	vault *keystore.Vault,
 ) []byte {
 	hash := crypto.Keccak256Hash(proofOfDilegence)
 
@@ -63,7 +63,7 @@ func SignProofOfDiligence(
 	proofOfDilegenceToHash := append(prefix, hash_bytes...)
 	final_hash := crypto.Keccak256Hash(proofOfDilegenceToHash)
 
-	signatureOfProofOfDiligence, err := signer.SignData(final_hash[:])
+	signatureOfProofOfDiligence, err := vault.SignData(final_hash[:])
 	if err != nil {
 		wtCommon.Error(err)
 	}

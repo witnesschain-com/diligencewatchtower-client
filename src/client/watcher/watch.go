@@ -155,7 +155,7 @@ func StartWatcher(
 		wtCommon.Fatal(err)
 	}
 
-	signer, err := 	keystore.SetupVault(globalConfigData)
+	vault, err := 	keystore.SetupVault(globalConfigData)
 
 	if err != nil {
 		wtCommon.Error(err)
@@ -192,7 +192,7 @@ func StartWatcher(
 
 			for number_of_retries < configData.Retries {
 
-				if do_tracing(parsed_output, signer) == true {
+				if do_tracing(parsed_output, vault) == true {
 					number_of_retries = 0
 					parsed_output = nil
 					break
@@ -221,7 +221,7 @@ func StartWatcher(
 
 				parsed_output = opchain.ParseOutputProposed(filteredLog)
 
-				if do_tracing(parsed_output, signer) == true {
+				if do_tracing(parsed_output, vault) == true {
 					wtCommon.Info("Waiting for next proposal ...")
 					parsed_output = nil
 				}
