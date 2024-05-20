@@ -16,6 +16,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -329,6 +330,10 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		simpleConfig.PrivateKey = private_key
 		config.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey).Hex()
 		simpleConfig.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey)
+	}
+	
+	if len(config.WatchtowerAddress) != 0 {
+		simpleConfig.WatchtowerAddress = common.HexToAddress(config.WatchtowerAddress)
 	}
 
 
