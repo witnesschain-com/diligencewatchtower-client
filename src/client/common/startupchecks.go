@@ -34,7 +34,7 @@ func ValidateWatchtowerAddress(config *WatchTowerConfig) bool {
 	if err != nil {
 		Fatal(err)
 	} else if isValid {
-		Success("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() + " is not registered with WitnessChain, please register ")
+		Success("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() + " is registered with WitnessChain")
 	} else {
 		Error("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() +  "address is invalid, please ensure that your watchtower's eth address is registered with WitnessChain")
 		return false
