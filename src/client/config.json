@@ -10,6 +10,7 @@
 
              "// WARNING 1"                  : "This PRIVATE key is for the identity of watchtower, and NOT operator's private key",
              "// WARNING 2"                  : "NEVER expose your operator's private key anywhere",
+     "watchtower_address"                    : "",
 
      "host_name"                             : "",
 
@@ -25,10 +26,10 @@
 
              "// EXAMPLE"                    : "wss://my-L1-node -OR- ws://my-L1-node",
       
-      "proof_submission_chain_url"           : "wss://witnesschain-testnet-rpc.eu-north-2.gateway.fm/ws",
       "currently_watching_l1"                : "eth_testnet",
       "eth_testnet_chain_id"                 : 11155111,
-      "proof_submission_chain_id"            : 250628747,
+      "proof_submission_chain_url"           : "https://blue-orangutan-rpc.eu-north-2.gateway.fm/",
+      "proof_submission_chain_id"            : 1237146866,
       "currently_watching_l2"                : "base", "// TODO" : "set the chain to watch, choose between 'optimsm', 'base'",
       "witnesschain_coordinator_url"         : "https://api.witnesschain.com/",
 
@@ -66,9 +67,10 @@
            ]
       },
 
-      "alert_manager_address"                : "0x3a67c87ABc4Beead3F37c8C4CC9CB424B11222a5",
-      "diligence_proof_manager_address"      : "0x0FD3c8114CF6291E3EF684758A7211011A819832",
-      "operator_registry"                    : "0x11dbfa16074d1D3485e66800c321cf31ABacbEb3",
+      "alert_manager_address"                : "0xF9696529cB591E0EA9f08BBB5908Ae4a342a1F14",
+      "diligence_proof_manager_address"      : "0x7AB3b14F3177935d4539d80289906633615393F2",
+      "operator_registry"                    : "0x26710e60A36Ace8A44e1C3D7B33dc8B80eAb6cb7",
       "receipt_timeout"                      : 300,
-      "watchtower_retries"                   : 5
+      "watchtower_retries"                   : 5,
+      "external_signer_endpoint"             : "http://localhost:8545",
 }
