@@ -273,7 +273,7 @@ func (api *ExternalSigner) SignDataWithPassphrase(account accounts.Account, pass
 
 func (api *ExternalSigner) listAccounts() ([]common.Address, error) {
 	var res []common.Address
-	if err := api.client.Call(&res, "account_list"); err != nil {
+	if err := api.client.Call(&res, "eth_accounts"); err != nil {
 		return nil, err
 	}
 	return res, nil

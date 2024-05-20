@@ -1,10 +1,12 @@
 package keystore
 
 import (
+	"errors"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/witnesschain-com/diligencewatchtower-client/third_party/web3signer"
 
@@ -22,23 +24,38 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 
 	account := accounts.Account{Address: config.WatchtowerAddress}
 
+	if config.PrivateKey!= nil {
+		backend := newRawBackend(config.PrivateKey)
+		chainID := new(big.Int).SetUint64(uint64(config.ProofSubmissionChainID))
+		transactOpts := NewRawTransactionOpts(config.PrivateKey, chainID)
+		wtCommon.Info("keystore: loaded raw vault")
+		return &Vault{name: "raw", account: account, backend: backend, transactOpts: *transactOpts}, nil
+	}
+
+
 	if config.ExternalSignerEndpoint != "" {
 		backend, err := web3signer.NewExternalBackend(config.ExternalSignerEndpoint)
 		if err != nil {
 			wtCommon.Error(err)
 		}
+		if  config.WatchtowerAddress.Cmp(common.HexToAddress("0")) == 0{
+			if len(backend.Wallets()) == 0{
+				return nil, errors.New("web3signer: empty wallet")
+			}
+
+			if len(backend.Wallets()[0].Accounts()) == 0 {
+				return nil, errors.New("web3signer: no keys found")
+			}
+
+			config.WatchtowerAddress = backend.Wallets()[0].Accounts()[0].Address
+			account = accounts.Account{Address: config.WatchtowerAddress}
+		}
+		wtCommon.Info("keystore: loaded web3signer vault")
 		return &Vault{name: "web3signer", account:  account, backend: backend}, nil
 	}
 
 	if config.Vault != "" {
 		wtCommon.Info("setup encrypted vault")
-	}
-
-	if config.PrivateKey!= nil {
-		backend := newRawBackend(config.PrivateKey)
-		chainID := new(big.Int).SetUint64(uint64(config.ProofSubmissionChainID))
-		transactOpts := NewRawTransactionOpts(config.PrivateKey, chainID)
-		return &Vault{name: "raw", account: account, backend: backend, transactOpts: *transactOpts}, nil
 	}
 
 	wtCommon.Fatal("SetupSigner Failed");

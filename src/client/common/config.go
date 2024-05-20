@@ -53,7 +53,6 @@ type WatchTowerConfig struct {
 	AlertManagerAddress          string `json:"alert_manager_address"`
 	DiligenceProofManagerAddress string `json:"diligence_proof_manager_address"`
 	OperatorRegistry             string `json:"operator_registry"`
-	RollupRegistry               string `json:"rollup_registry"`
 	ExternalSignerEndpoint       string `json:"external_signer_endpoint"`
 }
 
@@ -156,9 +155,6 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 	if config.OperatorRegistry == "" {
 		Error("Invalid config: please set 'operator_registry'")
 		isValid = false
-	}
-	if config.RollupRegistry == "" {
-		Warning("'rollup_registry' not set")
 	}
 
 	// validate optional configs

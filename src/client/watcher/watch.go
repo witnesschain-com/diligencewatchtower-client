@@ -145,9 +145,7 @@ func StartWatcher(
 ) bool {
 	defer wg.Done()
 
-	wtCommon.Info("Determining chain assignment ...")
 	globalConfigData = wtCommon.LoadSimplifiedConfig(configData, globalConfigData)
-	wtCommon.Success("Rollup chain assigned is: `" + configData.CurrentlyWatchingL2 + "`")
 
 	// subscribe to state commitment events on L1
 	_, eth_sub, eth_logs, err := L1.ListenForProposals(globalConfigData)

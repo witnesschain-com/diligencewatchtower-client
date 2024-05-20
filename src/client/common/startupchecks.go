@@ -9,7 +9,6 @@ import (
 // Check if we are eigen-layer operator
 // Check if we are whitelisted by witnesschain
 func ValidateWatchtowerAddress(config *WatchTowerConfig) bool {
-	Info("Validating watchtower address ...")
 	callOpts := bind.CallOpts{}
 
 	L1Client, err := GetConnection(
@@ -21,20 +20,24 @@ func ValidateWatchtowerAddress(config *WatchTowerConfig) bool {
 	}
 	defer L1Client.Close()
 
-	Success(config.WatchtowerAddress)
-
 	OperatorRegistryAddress := common.HexToAddress(config.OperatorRegistry)
+
+	Info("Validating watchtower address ...")
+	simplifiedConfig := LoadSimplifiedConfig(config, nil)
+
+	Info("watchtower address: " + simplifiedConfig.WatchtowerAddress.Hex())
 
 	operatorRegistryContract, err := bindings.NewOperatorRegistry(OperatorRegistryAddress, L1Client)
 	if err != nil {
 		Fatal(err)
 	}
-	simplifiedConfig := LoadSimplifiedConfig(config, nil)
+
+
 	isValid, err := operatorRegistryContract.IsValidWatchtower(&callOpts, simplifiedConfig.WatchtowerAddress)
 	if err != nil {
 		Fatal(err)
 	} else if isValid {
-		Success("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() + " is registered with WitnessChain")
+		Success("Watchtower: " + simplifiedConfig.WatchtowerAddress.Hex() + " is registered with WitnessChain")
 	} else {
 		Error("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() +  "address is invalid, please ensure that your watchtower's eth address is registered with WitnessChain")
 		return false
