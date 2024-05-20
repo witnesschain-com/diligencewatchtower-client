@@ -44,7 +44,6 @@ func (eb *ExternalBackend) Wallets() []accounts.Wallet {
 
 func NewExternalBackend(endpoint string) (*ExternalBackend, error) {
 	signer, err := NewExternalSigner(endpoint)
-	fmt.Print(signer)
 	if err != nil {
 		return nil, err
 	}
