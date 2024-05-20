@@ -331,8 +331,10 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 			Fatal(err)
 		}
 		simpleConfig.PrivateKey = private_key
+		config.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey).Hex()
 		simpleConfig.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey)
 	}
+
 
 	switch config.CurrentlyWatchingL1 {
 	case "eth":
