@@ -2,6 +2,7 @@ package keystore
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -35,30 +36,32 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 
 	if config.ExternalSignerEndpoint != "" {
 		backend, err := web3signer.NewExternalBackend(config.ExternalSignerEndpoint)
+		fmt.Print(backend, err)
 		if err != nil {
-			wtCommon.Error(err)
-		}
-		if  config.WatchtowerAddress.Cmp(common.HexToAddress("0")) == 0{
-			if len(backend.Wallets()) == 0{
-				return nil, errors.New("web3signer: empty wallet")
-			}
+			wtCommon.Info(err)
+		} else {
+			if config.WatchtowerAddress.Cmp(common.HexToAddress("0")) == 0{
+				if len(backend.Wallets()) == 0{
+					return nil, errors.New("web3signer: empty wallet")
+				}
 
-			if len(backend.Wallets()[0].Accounts()) == 0 {
-				return nil, errors.New("web3signer: no keys found")
-			}
+				if len(backend.Wallets()[0].Accounts()) == 0 {
+					return nil, errors.New("web3signer: no keys found")
+				}
 
-			config.WatchtowerAddress = backend.Wallets()[0].Accounts()[0].Address
-			account = accounts.Account{Address: config.WatchtowerAddress}
+				config.WatchtowerAddress = backend.Wallets()[0].Accounts()[0].Address
+				account = accounts.Account{Address: config.WatchtowerAddress}
+			}
+			wtCommon.Info("keystore: loaded web3signer vault")
+			return &Vault{name: "web3signer", account:  account, backend: backend}, nil
 		}
-		wtCommon.Info("keystore: loaded web3signer vault")
-		return &Vault{name: "web3signer", account:  account, backend: backend}, nil
 	}
 
 	if config.Vault != "" {
 		wtCommon.Info("setup encrypted vault")
 	}
 
-	wtCommon.Fatal("SetupSigner Failed");
+	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted fs");
 
 	return nil, nil
 }

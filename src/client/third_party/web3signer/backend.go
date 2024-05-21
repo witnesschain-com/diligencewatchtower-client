@@ -279,9 +279,9 @@ func (api *ExternalSigner) listAccounts() ([]common.Address, error) {
 }
 
 func (api *ExternalSigner) pingVersion() (string, error) {
-	// var v string
-	// if err := api.client.Call(&v, "account_version"); err != nil {
-	// 	return "", err
-	// }
+	var v[] string
+	if err := api.client.Call(&v, "eth_accounts"); err != nil {
+		return "", err
+	}
 	return "v1.0", nil
 }
