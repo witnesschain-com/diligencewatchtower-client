@@ -33,7 +33,6 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 		return &Vault{name: "raw", account: account, backend: backend, transactOpts: *transactOpts}, nil
 	}
 
-
 	if config.ExternalSignerEndpoint != "" {
 		backend, err := web3signer.NewExternalBackend(config.ExternalSignerEndpoint)
 		fmt.Print(backend, err)
@@ -42,7 +41,7 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 		} else {
 			if config.WatchtowerAddress.Cmp(common.HexToAddress("0")) == 0{
 				if len(backend.Wallets()) == 0{
-					return nil, errors.New("web3signer: empty wallet")
+					return nil, errors.New("web3signer: no wallet found")
 				}
 
 				if len(backend.Wallets()[0].Accounts()) == 0 {
