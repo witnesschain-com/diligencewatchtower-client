@@ -15,9 +15,9 @@ import (
 )
 
 type Vault struct {
-	name string
-	account accounts.Account
-	backend accounts.Backend
+	name         string
+	account      accounts.Account
+	backend      accounts.Backend
 	transactOpts bind.TransactOpts
 }
 
@@ -25,7 +25,7 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 
 	account := accounts.Account{Address: config.WatchtowerAddress}
 
-	if config.PrivateKey!= nil {
+	if config.PrivateKey != nil {
 		backend := newRawBackend(config.PrivateKey)
 		chainID := new(big.Int).SetUint64(uint64(config.ProofSubmissionChainID))
 		transactOpts := NewRawTransactionOpts(config.PrivateKey, chainID)
@@ -39,8 +39,8 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 		if err != nil {
 			wtCommon.Info(err)
 		} else {
-			if config.WatchtowerAddress.Cmp(common.HexToAddress("0")) == 0{
-				if len(backend.Wallets()) == 0{
+			if config.WatchtowerAddress.Cmp(common.HexToAddress("0")) == 0 {
+				if len(backend.Wallets()) == 0 {
 					return nil, errors.New("web3signer: no wallet found")
 				}
 
@@ -52,7 +52,7 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 				account = accounts.Account{Address: config.WatchtowerAddress}
 			}
 			wtCommon.Info("keystore: loaded web3signer vault")
-			return &Vault{name: "web3signer", account:  account, backend: backend}, nil
+			return &Vault{name: "web3signer", account: account, backend: backend}, nil
 		}
 	}
 
@@ -60,22 +60,21 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 		wtCommon.Info("setup encrypted vault")
 	}
 
-	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted fs");
+	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted fs")
 
 	return nil, nil
 }
 
-func (vault *Vault) NewTransactOpts(chainID *big.Int) *bind.TransactOpts{
-	if vault.name == "raw"{
+func (vault *Vault) NewTransactOpts(chainID *big.Int) *bind.TransactOpts {
+	if vault.name == "raw" {
 		return &vault.transactOpts
 	}
-	if vault.name == "web3signer"{
+	if vault.name == "web3signer" {
 		return NewWeb3SignerTransactionOpts(vault, nil)
 	}
-	panic("NewTransactOpts()");
+	panic("NewTransactOpts()")
 	return nil
 }
-
 
 func (vault *Vault) SignData(data []byte) ([]byte, error) {
 	wallets := vault.backend.Wallets()
@@ -89,7 +88,7 @@ func (vault *Vault) SignData(data []byte) ([]byte, error) {
 		return signedData, nil
 	}
 
-	wtCommon.Fatal("SignData failed, watchtower account not found in the keystore");
+	wtCommon.Fatal("SignData failed, watchtower account not found in the keystore")
 	return nil, nil
 }
 
@@ -104,8 +103,7 @@ func (vault *Vault) SignTx(account accounts.Account, tx *types.Transaction, chai
 		}
 		return signedTx, nil
 	}
-	
-	wtCommon.Fatal("SignData failed, watchtower account not found in the keystore");
+
+	wtCommon.Fatal("SignData failed, watchtower account not found in the keystore")
 	return nil, nil
 }
-
