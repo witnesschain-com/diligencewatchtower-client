@@ -72,5 +72,6 @@
       "operator_registry"                    : "0x26710e60A36Ace8A44e1C3D7B33dc8B80eAb6cb7",
       "receipt_timeout"                      : 300,
       "watchtower_retries"                   : 5,
-      "external_signer_endpoint"             : "http://localhost:9000"
+      "external_signer_endpoint"             : "http://localhost:9000",
+      "gocryptfs_key_name"                   : "",    "// TODO" : "set the private key name used for the watchtower key in gocryptfs (this is optional)"
 }
