@@ -233,22 +233,30 @@ func Fatal(message any) bool {
 	} else {
 		publicKeyAddressHex = publicKeyAddress.Hex()
 	}
+	fmt.Print(currentConfig.AlertURL)
 
 	if currentConfig.AlertURL != "" {
-		data, _ := json.Marshal(map[string]interface{}{
-			"watchtower_id": publicKeyAddressHex,
-			"from":          from,
-			"timestamp":     now,
-			"file":          file,
-			"line":          line,
-			"message":       fatalErrorMessageString,
+		// data, _ := json.Marshal(map[string]interface{}{
+		// 	"watchtower_id": publicKeyAddressHex,
+		// 	"from":          from,
+		// 	"timestamp":     now,
+		// 	"file":          file,
+		// 	"line":          line,
+		// 	"message":       fatalErrorMessageString,
+		// })
+
+		message := fmt.Sprintf("watchtower_id: %v\nfrom: %v\ntimestamp: %v\nfile: %v\nline: %vmessage: %v\n", publicKeyAddressHex, from, now, file, fatalErrorMessageString)
+		
+		request, _ := json.Marshal(map[string] interface{}{
+			"text": message,
 		})
 
-		requestBody := bytes.NewBuffer(data)
-		_, err := http.Post(currentConfig.AlertURL, "application/json", requestBody)
+		requestBody := bytes.NewBuffer(request)
+		resp, err := http.Post(currentConfig.AlertURL, "application/json", requestBody)
 		if err != nil {
 			Error(err)
 		}
+		fmt.Print(resp)
 	}
 
 	os.Exit(123)
