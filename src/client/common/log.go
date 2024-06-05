@@ -236,14 +236,6 @@ func Fatal(message any) bool {
 	fmt.Print(currentConfig.AlertURL)
 
 	if currentConfig.AlertURL != "" {
-		// data, _ := json.Marshal(map[string]interface{}{
-		// 	"watchtower_id": publicKeyAddressHex,
-		// 	"from":          from,
-		// 	"timestamp":     now,
-		// 	"file":          file,
-		// 	"line":          line,
-		// 	"message":       fatalErrorMessageString,
-		// })
 
 		message := fmt.Sprintf("watchtower_id: %v\nfrom: %v\ntimestamp: %v\nfile: %v\nline: %vmessage: %v\n", publicKeyAddressHex, from, now, file, fatalErrorMessageString)
 		
@@ -256,7 +248,9 @@ func Fatal(message any) bool {
 		if err != nil {
 			Error(err)
 		}
-		fmt.Print(resp)
+		if resp.StatusCode != 200 {
+			fmt.Print(resp)
+		}
 	}
 
 	os.Exit(123)
