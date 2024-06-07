@@ -103,6 +103,10 @@ func (cc CoordinatorClient) doPrelogin() (string, error) {
 		return "", err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		reason := wtCommon.ParseResponseBody(resp.Body)
+		wtCommon.Info(reason)
+	}
 	apiPreloginResponse := preloginResponse{}
 	err = json.NewDecoder(resp.Body).Decode(&apiPreloginResponse)
 	if err != nil {
@@ -126,10 +130,15 @@ func (cc CoordinatorClient) doLogin(message string) (int, error) {
 		"application/json",
 		requestBody,
 	)
+
 	if err != nil {
 		return -1, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		reason := wtCommon.ParseResponseBody(resp.Body)
+		wtCommon.Info(reason)
+	}
 	return resp.StatusCode, nil
 }
 
@@ -140,6 +149,14 @@ func (cc CoordinatorClient) SubmitResult(data []byte) (int, error) {
 		"application/json",
 		requestBody,
 	)
+	if err != nil {
+		return -1, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		reason := wtCommon.ParseResponseBody(resp.Body)
+		wtCommon.Info(reason)
+	}
 	return resp.StatusCode, err
 }
 
