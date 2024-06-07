@@ -23,8 +23,9 @@ type CoordinatorClient struct {
 }
 
 const (
-	PRELOGIN string = "tracer/v1/watchtower/pre-login"
-	LOGIN    string = "tracer/v1/watchtower/login"
+	PRELOGIN      string = "tracer/v1/watchtower/pre-login"
+	LOGIN         string = "tracer/v1/watchtower/login"
+	SUBMIT_RESULT string = "tracer/v1/watchtower/submit-result"
 )
 
 var BASEURL string
@@ -130,6 +131,16 @@ func (cc CoordinatorClient) doLogin(message string) (int, error) {
 	}
 	defer resp.Body.Close()
 	return resp.StatusCode, nil
+}
+
+func (cc CoordinatorClient) SubmitResult(data []byte) (int, error) {
+	requestBody := bytes.NewBuffer(data)
+	resp, err := cc.client.Post(
+		BASEURL+SUBMIT_RESULT,
+		"application/json",
+		requestBody,
+	)
+	return resp.StatusCode, err
 }
 
 type preloginResponse struct {

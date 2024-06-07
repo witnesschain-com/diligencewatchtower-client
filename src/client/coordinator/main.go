@@ -103,7 +103,7 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 
 	var DataChannel = make(chan string, 5000)
 
-	go HandleMessages(wsHandler.Connection, DataChannel, dependencies)
+	go HandleMessages(wsHandler.Connection, DataChannel, dependencies, client)
 	go Heartbeat(wsHandler.Connection)
 	err = wsHandler.ListenForMessages(DataChannel)
 	wtCommon.Error(err)
@@ -111,7 +111,7 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 
 }
 
-func HandleMessages(connection *websocket.Conn, channel chan string, deps datatypes.TracerDependencies) {
+func HandleMessages(connection *websocket.Conn, channel chan string, deps datatypes.TracerDependencies, client auth.CoordinatorClient) {
 	var lastTxn string
 	var lastChainID string
 	for {
@@ -149,12 +149,19 @@ func HandleMessages(connection *websocket.Conn, channel chan string, deps dataty
 						cutoff = 50
 					}
 					wtCommon.Info(fmt.Sprintf("WS:SEN Type[%d] Content[%s]", websocket.TextMessage, string(logData)))
-
-					err = connection.WriteJSON(coordinatorResp)
-					if err != nil {
-						wtCommon.Error(err)
-						break
-					}
+					statusCode, err := client.SubmitResult(logData)
+					_ = statusCode
+					_ = err
+					// if statusCode != 200 {
+					// 	wtCommon.Info(fmt.Sprintf("Error: %d", statusCode))
+					// } else {
+					// 	wtCommon.Success("Submitted result to coordinator")
+					// }
+					// err = connection.WriteJSON(coordinatorResp)
+					// if err != nil {
+					// 	wtCommon.Error(err)
+					// 	break
+					// }
 				}
 			}
 		}
