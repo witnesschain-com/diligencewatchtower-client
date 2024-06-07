@@ -206,6 +206,10 @@ func handleWsJson(data string) (*datatypes.WSRequestData, error) {
 		return nil, err
 	}
 
+	if m.(map[string]interface{})["messageType"].(string) == "error" {
+		wtCommon.Error(m.(map[string]interface{})["error"].(map[string]interface{})["message"].(string))
+	}
+
 	return &datatypes.WSRequestData{
 		Api:             m.(map[string]interface{})["api"].(string),
 		MessageType:     m.(map[string]interface{})["messageType"].(string),
