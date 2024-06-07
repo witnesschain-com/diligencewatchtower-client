@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"io"
 
 	"golang.org/x/net/publicsuffix"
 
@@ -134,6 +135,15 @@ func (cc CoordinatorClient) doLogin(message string) (int, error) {
 	}
 	
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			wtCommon.Error(err)
+		}
+		bodyString := string(bodyBytes)
+		wtCommon.Error(bodyString)
+	}
+
 	return resp.StatusCode, nil
 }
 
