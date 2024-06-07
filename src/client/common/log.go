@@ -226,28 +226,22 @@ func Fatal(message any) bool {
 
 	// send the error if alert url is set
 	currentConfig := LoadConfigFromJson()
-	publicKeyAddressHex := "watchtower eth address not found"
-	publicKeyAddress, err := GetPublicKeyAddressFromPrivateKey(currentConfig.PrivateKey)
-	if err != nil {
-		Error(err)
-	} else {
-		publicKeyAddressHex = publicKeyAddress.Hex()
-	}
 
 	if currentConfig.AlertURL != "" {
-		data, _ := json.Marshal(map[string]interface{}{
-			"watchtower_id": publicKeyAddressHex,
-			"from":          from,
-			"timestamp":     now,
-			"file":          file,
-			"line":          line,
-			"message":       fatalErrorMessageString,
+
+		message := fmt.Sprintf("watchtower_id: %v\nfrom: %v\ntimestamp: %v\nfile: %v\nline: %vmessage: %v\n", currentConfig.WatchtowerAddress, from, now, file, line, fatalErrorMessageString)
+		
+		request, _ := json.Marshal(map[string] interface{}{
+			"text": message,
 		})
 
-		requestBody := bytes.NewBuffer(data)
-		_, err := http.Post(currentConfig.AlertURL, "application/json", requestBody)
+		requestBody := bytes.NewBuffer(request)
+		resp, err := http.Post(currentConfig.AlertURL, "application/json", requestBody)
 		if err != nil {
 			Error(err)
+		}
+		if resp.StatusCode != 200 {
+			fmt.Print(resp)
 		}
 	}
 

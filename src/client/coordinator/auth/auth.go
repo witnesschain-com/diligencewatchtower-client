@@ -2,7 +2,6 @@ package auth
 
 import (
 	"bytes"
-	"crypto/ecdsa"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,10 +10,11 @@ import (
 
 	"golang.org/x/net/publicsuffix"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/crypto"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	coordCfg "github.com/witnesschain-com/diligencewatchtower-client/coordinator/configuration"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
 
 type CoordinatorClient struct {
@@ -30,18 +30,16 @@ const (
 
 var BASEURL string
 
-func SignCoordinatorMessage(message string, privateKey *ecdsa.PrivateKey) (string, error) {
-	fullMessage := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(message), message)
-	hash := crypto.Keccak256Hash([]byte(fullMessage))
-	signatureBytes, err := crypto.Sign(hash.Bytes(), privateKey)
+func SignCoordinatorMessage(message string, watchtowerAddress common.Address, vault *keystore.Vault) (string, error) {
+	signature, err := vault.SignData([]byte(message))
 	if err != nil {
+		wtCommon.Error(err)
 		return "", err
 	}
-	signatureBytes[64] += 27
-	return hexutil.Encode(signatureBytes), nil
+	return hexutil.Encode(signature), nil
 }
 
-func (cc *CoordinatorClient) Initialize(coordinatorUrl string, privateKey *ecdsa.PrivateKey, chainID string) error {
+func (cc *CoordinatorClient) Initialize(coordinatorUrl string, watchtowerAddress common.Address, chainID string, config *wtCommon.SimplifiedConfig) error {
 	BASEURL = coordinatorUrl
 	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 	if err != nil {
@@ -52,10 +50,15 @@ func (cc *CoordinatorClient) Initialize(coordinatorUrl string, privateKey *ecdsa
 		Jar: jar,
 	}
 
-	cc.config.PrivateKey = privateKey
+	cc.config.WatchtowerAddress = watchtowerAddress
+
+	cc.config.Vault, err = keystore.SetupVault(config)
+	if err != nil {
+		wtCommon.Error(err)
+		return err
+	}
+
 	cc.config.WatchingChainID = chainID
-	addr, _ := wtCommon.GetPublicKeyAddressFromPrivateKey(privateKey)
-	cc.config.PublicKeyHex = addr.Hex()
 	return nil
 }
 
@@ -70,7 +73,7 @@ func (cc *CoordinatorClient) AuthenticateToWitnesschain() (bool, error) {
 	}
 
 	if statusCode != 200 {
-		wtCommon.Error(fmt.Sprintf("Unable to Login - Err[%d]", statusCode))
+		wtCommon.Error(fmt.Sprintf("Unable to Login - Err[%d] %v", statusCode, err))
 		return false, nil
 	}
 	return true, nil
@@ -89,10 +92,11 @@ func (cc CoordinatorClient) GetHeaders() http.Header {
 
 func (cc CoordinatorClient) doPrelogin() (string, error) {
 	body, _ := json.Marshal(map[string]string{
-		"publicKey":         cc.config.PublicKeyHex,
+		"publicKey":         cc.config.WatchtowerAddress.Hex(),
 		"keyType":           "ethereum", //ToDo: Get this dynamically
 		"currentlyWatching": cc.config.WatchingChainID,
 	})
+
 	requestBody := bytes.NewBuffer(body)
 	resp, err := cc.client.Post(
 		BASEURL+PRELOGIN,
@@ -116,7 +120,7 @@ func (cc CoordinatorClient) doPrelogin() (string, error) {
 }
 
 func (cc CoordinatorClient) doLogin(message string) (int, error) {
-	signedMessage, err := SignCoordinatorMessage(message, cc.config.PrivateKey)
+	signedMessage, err := SignCoordinatorMessage(message, cc.config.WatchtowerAddress, cc.config.Vault)
 	if err != nil {
 		return -1, err
 	}
@@ -134,6 +138,7 @@ func (cc CoordinatorClient) doLogin(message string) (int, error) {
 	if err != nil {
 		return -1, err
 	}
+
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		reason := wtCommon.ParseResponseBody(resp.Body)
