@@ -13,6 +13,7 @@ import (
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	datatypes "github.com/witnesschain-com/diligencewatchtower-client/coordinator/Datatypes"
 	auth "github.com/witnesschain-com/diligencewatchtower-client/coordinator/auth"
+	"github.com/witnesschain-com/diligencewatchtower-client/coordinator/core"
 	ws "github.com/witnesschain-com/diligencewatchtower-client/coordinator/core"
 	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/coordinator/interfaces"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
@@ -82,7 +83,7 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 	}
 
 	headers := client.GetHeaders()
-	wsHandler := ws.WebsockerClient{}
+	wsHandler := ws.WebsocketClient{}
 
 	err = wsHandler.ConnectToCoordinator(headers)
 	if err != nil {
@@ -109,7 +110,7 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 
 	var DataChannel = make(chan string, 5000)
 
-	go HandleMessages(wsHandler.Connection, DataChannel, dependencies, simpleConfig, client)
+	go HandleMessages(&wsHandler, DataChannel, dependencies, simpleConfig, client)
 	go Heartbeat(wsHandler.Connection)
 	err = wsHandler.ListenForMessages(DataChannel)
 	wtCommon.Error(err)
@@ -117,9 +118,10 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 
 }
 
-func HandleMessages(connection *websocket.Conn, channel chan string, deps datatypes.TracerDependencies, config *wtCommon.SimplifiedConfig, client auth.CoordinatorClient) {
+func HandleMessages(ws *core.WebsocketClient, channel chan string, deps datatypes.TracerDependencies, config *wtCommon.SimplifiedConfig, client auth.CoordinatorClient) {
 	var lastTxn string
 	var lastChainID string
+	connection := ws.Connection
 	signer, err := keystore.SetupVault(config)
 	if err != nil {
 		wtCommon.Error(err)
@@ -160,25 +162,44 @@ func HandleMessages(connection *websocket.Conn, channel chan string, deps dataty
 						cutoff = 50
 					}
 					wtCommon.Info(fmt.Sprintf("WS:SEN Type[%d] Content[%s]", websocket.TextMessage, string(logData)))
-					statusCode, err := client.SubmitResult(logData)
-					_ = statusCode
-					_ = err
-					// if statusCode != 200 {
-					// 	wtCommon.Info(fmt.Sprintf("Error: %d", statusCode))
-					// } else {
-					// 	wtCommon.Success("Submitted result to coordinator")
-					// }
-					// err = connection.WriteJSON(coordinatorResp)
-					// if err != nil {
-					// 	wtCommon.Error(err)
-					// 	break
-					// }
+					if coordinatorResp.Size() > ws.GetWriteBufferSize() {
+						if err := handleRestApiSubmission(client, logData); err != nil {
+							wtCommon.Error(err)
+							break
+						}
+
+					} else {
+						if err := handleWebsocketResultSubmission(connection, coordinatorResp); err != nil {
+							wtCommon.Error(err)
+							break
+						}
+					}
+
 				}
 			}
 		}
 
 	}
 	wtCommon.Warning("Terminating message handler")
+}
+
+func handleWebsocketResultSubmission(connection *websocket.Conn, coordinatorResp datatypes.WSTracerResponse) error {
+	err := connection.WriteJSON(coordinatorResp)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func handleRestApiSubmission(client auth.CoordinatorClient, logData []byte) error {
+	statusCode, err := client.SubmitResult(logData)
+	if statusCode == 200 {
+		wtCommon.Success("Submitted result to coordinator")
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func Heartbeat(connection *websocket.Conn) {
