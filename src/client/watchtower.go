@@ -26,7 +26,8 @@ import (
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
 
-const VERSION = "undefined"
+var VERSION = "undefined"
+
 const sleepTimeIfNoChainAssigned = 5 * time.Second
 
 func main() {

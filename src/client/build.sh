@@ -1,7 +1,7 @@
 #!/bin/sh
 
 v=$(go version | { read _ _ v _; echo ${v#go}; })
-echo "$v"
+
 if [ "$v" != "1.20" ]; then
     echo "go version not compatible, try experimental build.. exiting"
     exit 1
