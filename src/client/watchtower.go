@@ -26,9 +26,7 @@ import (
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
 
-
-
-const version = "v1.0"
+const VERSION = "undefined"
 const sleepTimeIfNoChainAssigned = 5 * time.Second
 
 func main() {
@@ -72,15 +70,12 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 		configData.WatchtowerAddress = vault.NewTransactOpts(nil).From.Hex()
 	}
 
-
-	
-
 	// validate config valus are set correctly and that watchtower address is valid
 	if !wtCommon.PreStartupChecks(configData) {
 		wtCommon.Fatal("Pre-startup checks failed!")
 	}
 
-	wtCommon.Info("Starting Watchtower (" + version + ") ...")
+	wtCommon.Info("Starting Watchtower (" + VERSION + ") ...")
 
 	// setup EL monitoring and nodeAPI
 	external.InitialiseELMonitoring()
