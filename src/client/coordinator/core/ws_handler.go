@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -53,7 +52,7 @@ func (wc *WebsocketClient) ListenForMessages(dataChannel chan string) error {
 
 	var lastRequest string = ""
 	for {
-		msgType, payload, err := wc.Connection.ReadMessage()
+		_, payload, err := wc.Connection.ReadMessage()
 		if err != nil {
 			return err
 		}
@@ -66,7 +65,7 @@ func (wc *WebsocketClient) ListenForMessages(dataChannel chan string) error {
 			if lastRequest == content {
 				// wtCommon.Warning("Ignoring repeated request")
 			} else {
-				wtCommon.Info(fmt.Sprintf("WS:REC Type[%d] Content[%s]", msgType, content))
+				wtCommon.Info("WS: Accepting coordinator request")
 
 				lastRequest = content
 				dataChannel <- content
