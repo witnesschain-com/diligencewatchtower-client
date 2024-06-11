@@ -2,6 +2,8 @@ package datatypes
 
 import (
 	"crypto/ecdsa"
+	"encoding/json"
+	"fmt"
 
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
@@ -25,6 +27,15 @@ type WSTracerResponse struct {
 	TransactionHash string `json:"transactionHash"`
 	Result          string `json:"result"`
 	Signature       string `json:"signature"`
+}
+
+func (s *WSTracerResponse) Size() int {
+	jsonMarshallBytes, err := json.Marshal(s)
+	if err != nil {
+		wtCommon.Error(fmt.Sprintf("Unable to marshall coordinator result: %v", err))
+	}
+	size := len(jsonMarshallBytes)
+	return size
 }
 
 type TraceTxnResult struct {

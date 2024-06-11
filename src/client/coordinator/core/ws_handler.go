@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 
@@ -14,14 +13,22 @@ const (
 	WS_URL = "wss://api.witnesschain.com/tracer/v1/watchtower/websocket"
 )
 
-type WebsockerClient struct {
+type WebsocketClient struct {
 	dialer     websocket.Dialer
 	Connection *websocket.Conn
 }
 
-func (wc *WebsockerClient) ConnectToCoordinator(headers http.Header) error {
+func (wc WebsocketClient) GetWriteBufferSize() int {
+	return wc.dialer.WriteBufferSize
+}
+
+func (wc *WebsocketClient) ConnectToCoordinator(headers http.Header) error {
 	url, _ := url.Parse(WS_URL)
+	wc.dialer = websocket.Dialer{
+		WriteBufferSize: 65536,
+	}
 	connection, response, err := wc.dialer.Dial(url.String(), headers)
+	connection.EnableWriteCompression(true)
 	if err != nil {
 		wtCommon.Error(response) //Note: more info in case ws connection fails
 		return err
@@ -30,13 +37,13 @@ func (wc *WebsockerClient) ConnectToCoordinator(headers http.Header) error {
 	return nil
 }
 
-func (wc *WebsockerClient) CloseConnection() error {
+func (wc *WebsocketClient) CloseConnection() error {
 	wtCommon.Info("Disconnecting")
 	err := wc.Connection.Close()
 	return err
 }
 
-func (wc *WebsockerClient) ListenForMessages(dataChannel chan string) error {
+func (wc *WebsocketClient) ListenForMessages(dataChannel chan string) error {
 	defer func() {
 		wtCommon.Warning("Closing listener routine")
 		wc.Connection.Close()
@@ -44,7 +51,7 @@ func (wc *WebsockerClient) ListenForMessages(dataChannel chan string) error {
 
 	var lastRequest string = ""
 	for {
-		msgType, payload, err := wc.Connection.ReadMessage()
+		_, payload, err := wc.Connection.ReadMessage()
 		if err != nil {
 			return err
 		}
@@ -57,7 +64,7 @@ func (wc *WebsockerClient) ListenForMessages(dataChannel chan string) error {
 			if lastRequest == content {
 				// wtCommon.Warning("Ignoring repeated request")
 			} else {
-				wtCommon.Info(fmt.Sprintf("WS:REC Type[%d] Content[%s]", msgType, content))
+				wtCommon.Info("WS:Accepting coordinator request")
 
 				lastRequest = content
 				dataChannel <- content
