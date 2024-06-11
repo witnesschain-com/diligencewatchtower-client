@@ -1,7 +1,8 @@
 package datatypes
 
 import (
-	"unsafe"
+	"encoding/json"
+	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jellydator/ttlcache/v3"
@@ -30,8 +31,11 @@ type WSTracerResponse struct {
 }
 
 func (s *WSTracerResponse) Size() int {
-	size := int(unsafe.Sizeof(*s))
-	size += len(s.RequestID + s.Api + s.ChainId + s.TransactionHash + s.Result + s.Signature)
+	jsonMarshallBytes, err := json.Marshal(s)
+	if err != nil {
+		wtCommon.Error(fmt.Sprintf("Unable to marshall coordinator result: %v", err))
+	}
+	size := len(jsonMarshallBytes)
 	return size
 }
 

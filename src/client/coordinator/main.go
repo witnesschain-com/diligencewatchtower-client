@@ -2,7 +2,6 @@ package coordinator
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -161,17 +160,22 @@ func HandleMessages(ws *core.WebsocketClient, channel chan string, deps datatype
 					if cutoff > 50 {
 						cutoff = 50
 					}
-					wtCommon.Info(fmt.Sprintf("WS:SEN Type[%d] Content[%s]", websocket.TextMessage, string(logData)))
-					if coordinatorResp.Size() > ws.GetWriteBufferSize() {
-						if err := handleRestApiSubmission(client, logData); err != nil {
+					wsSuccessful := true
+					wtCommon.Info("WS: Submitting txn-tracer results..")
+					if coordinatorResp.Size() < ws.GetWriteBufferSize() {
+						if err := handleWebsocketResultSubmission(connection, coordinatorResp); err != nil {
 							wtCommon.Error(err)
+							wsSuccessful = false
 							break
 						}
 
-					} else {
-						if err := handleWebsocketResultSubmission(connection, coordinatorResp); err != nil {
-							wtCommon.Error(err)
-							break
+					}
+					if !wsSuccessful {
+						// 5 retries
+						for i := 0; i < 5; i++ {
+							if err := handleRestApiSubmission(client, logData); err == nil {
+								break
+							}
 						}
 					}
 
@@ -197,6 +201,7 @@ func handleRestApiSubmission(client auth.CoordinatorClient, logData []byte) erro
 		wtCommon.Success("Submitted result to coordinator")
 	}
 	if err != nil {
+		wtCommon.Error(err)
 		return err
 	}
 	return nil
