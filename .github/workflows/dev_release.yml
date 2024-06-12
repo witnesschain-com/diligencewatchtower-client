@@ -1,9 +1,6 @@
 name: Dev Release
 
 on:
-  push:
-    branches: #initial trigger
-        - 'chores/watchtower_patch' 
   workflow_dispatch: 
     inputs:
       watchtower_version:
@@ -31,7 +28,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }} #token
 
       -
         name: Build and push
