@@ -1,11 +1,14 @@
 name: Dev Release
 
 on:
+  push:
+    branches: #initial trigger
+        - 'chores/watchtower_patch' 
   workflow_dispatch: 
     inputs:
       watchtower_version:
         type: string
-        default: v1.0-internal
+        default: v1.0.1-internal
 jobs:
   docker:
     runs-on: ubuntu-latest
