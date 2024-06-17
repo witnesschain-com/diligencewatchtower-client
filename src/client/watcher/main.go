@@ -1,7 +1,6 @@
 package watcher
 
 import (
-	"fmt"
 	"math/big"
 	"strconv"
 
@@ -57,20 +56,12 @@ func SignProofOfDiligence(
 	vault *keystore.Vault,
 ) []byte {
 
-	// ethereumMessage := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(proofOfDilegence), proofOfDilegence)
 	hash := crypto.Keccak256Hash(proofOfDilegence)
-
-	
 
 	signatureOfProofOfDiligence, err := vault.SignData(hash.Bytes())
 	if err != nil {
 		wtCommon.Error(err)
 	}
-
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("\nsignatureOfProofOfDiligence: %x\n", signatureOfProofOfDiligence)
 
 	return signatureOfProofOfDiligence
 }
