@@ -11,7 +11,7 @@ test-opchain:
 	go test github.com/witnesschain-com/diligencewatchtower-client/opchain
 
 test-contractutils-anvil:
-	docker run --rm --detach --name op_sepolia --network=host ghcr.io/foundry-rs/foundry:latest 'anvil --chain-id 11155111 --fork-url ${L1RPC} '
+	docker run --rm --detach --name op_sepolia --network=host ghcr.io/foundry-rs/foundry:latest 'anvil --fork-url ${L1RPC} '
 	@sleep 15
 	-go test github.com/witnesschain-com/diligencewatchtower-client/contractutils
 	docker stop op_sepolia
