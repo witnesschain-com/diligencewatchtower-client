@@ -18,8 +18,8 @@ import (
 	"github.com/witnesschain-com/diligencewatchtower-client/L1"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"
-	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
 var parsed_output *opchain.OutputProposed = nil
@@ -141,11 +141,12 @@ func do_tracing(
 func StartWatcher(
 	wg *sync.WaitGroup,
 	configData *wtCommon.WatchTowerConfig,
+	simplifiedConfig *wtCommon.SimplifiedConfig,
 	configChan chan bool,
 ) bool {
 	defer wg.Done()
 
-	globalConfigData = wtCommon.LoadSimplifiedConfig(configData, globalConfigData)
+	globalConfigData = simplifiedConfig
 
 	// subscribe to state commitment events on L1
 	_, eth_sub, eth_logs, err := L1.ListenForProposals(globalConfigData)
@@ -153,7 +154,7 @@ func StartWatcher(
 		wtCommon.Fatal(err)
 	}
 
-	vault, err := 	keystore.SetupVault(globalConfigData)
+	vault, err := keystore.SetupVault(globalConfigData)
 
 	if err != nil {
 		wtCommon.Error(err)

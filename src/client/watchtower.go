@@ -26,8 +26,6 @@ import (
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
 
-
-
 const version = "v1.0"
 const sleepTimeIfNoChainAssigned = 5 * time.Second
 
@@ -63,6 +61,11 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 
 	simplifiedConfig := wtCommon.LoadSimplifiedConfig(configData, nil)
 
+	// validate config valus are set correctly and that watchtower address is valid
+	if !wtCommon.PreStartupChecks(configData, simplifiedConfig) {
+		wtCommon.Fatal("Pre-startup checks failed!")
+	}
+
 	vault, err := keystore.SetupVault(simplifiedConfig)
 	if err != nil {
 		wtCommon.Error(err)
@@ -70,14 +73,6 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 
 	if len(configData.WatchtowerAddress) == 0 {
 		configData.WatchtowerAddress = vault.NewTransactOpts(nil).From.Hex()
-	}
-
-
-	
-
-	// validate config valus are set correctly and that watchtower address is valid
-	if !wtCommon.PreStartupChecks(configData) {
-		wtCommon.Fatal("Pre-startup checks failed!")
 	}
 
 	wtCommon.Info("Starting Watchtower (" + version + ") ...")
@@ -88,19 +83,19 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 
 	go func() {
 		for {
-			coordinator.StartCoordinator(*configData)
+			coordinator.StartCoordinator(*simplifiedConfig)
 			time.Sleep(10 * time.Second)
 			wtCommon.Info("Restarting coordiantor client...")
 		}
 	}()
 
 	for {
-		Run(configData, nodeApi)
+		Run(configData, simplifiedConfig, nodeApi)
 	}
 
 }
 
-func Run(configData *wtCommon.WatchTowerConfig, nodeApi *nodeapi.NodeApi) bool {
+func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.SimplifiedConfig, nodeApi *nodeapi.NodeApi) bool {
 	watchingChain := ""
 
 	// channel used by webserver to alert watchtower about changes to config.json
@@ -130,7 +125,7 @@ func Run(configData *wtCommon.WatchTowerConfig, nodeApi *nodeapi.NodeApi) bool {
 	}
 
 	// run watcher as goroutines and wait using the wait group
-	go watcher.StartWatcher(&waitGroup, configData, configChan)
+	go watcher.StartWatcher(&waitGroup, configData, simplifiedConfig, configChan)
 	wtCommon.Success("WitnessChain Watchtower started!")
 
 	// wait for the 1 process to end (watchtower to stop)

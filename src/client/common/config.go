@@ -232,12 +232,15 @@ type SimplifiedConfig struct {
 	L1WebsocketURL               string
 	L2WebsocketURL               string
 	ProofSubmissionWebsocketURL  string
+	WitnesschainCoordinatorURL   string
 	ProofSubmissionChainID       int64
 	AlertManagerAddress          ethCommon.Address
 	DiligenceProofManagerAddress ethCommon.Address
+	OperatorRegistryAddress      ethCommon.Address
 	L2ExecRPCURL                 string
 	L2NodeRPCURL                 string
 	StateCommitmentAddress       ethCommon.Address
+	CurrentL2Chain               string
 	CurrentL2ChainID             int64
 	CurrentL1ChainID             int64
 	Retries                      int
@@ -312,9 +315,11 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	simpleConfig.WatchtowerAddress = ethCommon.HexToAddress(config.WatchtowerAddress)
 	simpleConfig.AlertManagerAddress = ethCommon.HexToAddress(config.AlertManagerAddress)
 	simpleConfig.DiligenceProofManagerAddress = ethCommon.HexToAddress(config.DiligenceProofManagerAddress)
+	simpleConfig.OperatorRegistryAddress = ethCommon.HexToAddress(config.OperatorRegistry)
 	simpleConfig.Retries = config.Retries
 	simpleConfig.ReceiptTimeout = config.ReceiptTimeout
 	simpleConfig.GasPrice = config.GasPrice
+	simpleConfig.WitnesschainCoordinatorURL = config.WitnesschainCoordinatorUrl
 	simpleConfig.ProofSubmissionWebsocketURL = config.ProofSubmissionWebsocketURL
 	simpleConfig.ProofSubmissionChainID = int64(config.ProofSubmissionChainID)
 	simpleConfig.ExternalSignerEndpoint = config.ExternalSignerEndpoint
@@ -371,6 +376,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 			simpleConfig.L2NodeRPCURL = chain.NodeRPCURL
 			simpleConfig.StateCommitmentAddress = ethCommon.HexToAddress(chain.L2OOAddress)
 			simpleConfig.CurrentL2ChainID = int64(chain.ChainID)
+			simpleConfig.CurrentL2Chain = chain.Name
 			chainParamsSet = true
 		}
 	}
