@@ -2,6 +2,7 @@
   
 FROM golang:1.20 as stage-build
 
+ARG WATCHTOWER_VERSION
 WORKDIR /watchtower/src/client/
 
 COPY . ./
