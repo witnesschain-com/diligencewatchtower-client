@@ -16,6 +16,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -24,6 +25,8 @@ import (
 // of the watchtower
 type WatchTowerConfig struct {
 	// L1 - ethereum RPC urls
+	PrivateKey                  string `json:"private_key"`
+	Vault                       string `json:"encrypted_vault_directory"`
 	EthWebsocketURL             string `json:"eth_websocket_url"`
 	EthTestnetWebsocketURL      string `json:"eth_testnet_websocket_url"`
 	ProofSubmissionWebsocketURL string `json:"proof_submission_chain_url"`
@@ -36,8 +39,7 @@ type WatchTowerConfig struct {
 	CurrentlyWatchingL2 string `json:"currently_watching_l2"`
 
 	// keys and tuning
-	PrivateKeyHex  string `json:"private_key"`
-	PrivateKey     *ecdsa.PrivateKey
+	WatchtowerAddress          string `json:"watchtower_address"`
 	Retries        int   `json:"watchtower_retries"`
 	ReceiptTimeout int   `json:"receipt_timeout"`
 	GasPrice       int64 `json:"gas_price"`
@@ -52,7 +54,7 @@ type WatchTowerConfig struct {
 	AlertManagerAddress          string `json:"alert_manager_address"`
 	DiligenceProofManagerAddress string `json:"diligence_proof_manager_address"`
 	OperatorRegistry             string `json:"operator_registry"`
-	RollupRegistry               string `json:"rollup_registry"`
+	ExternalSignerEndpoint       string `json:"external_signer_endpoint"`
 }
 
 func ValidateConfig(config *WatchTowerConfig) bool {
@@ -155,16 +157,6 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 		Error("Invalid config: please set 'operator_registry'")
 		isValid = false
 	}
-	if config.RollupRegistry == "" {
-		Warning("'rollup_registry' not set")
-	}
-
-	// validate key private_key is set correctly
-	if config.PrivateKeyHex == "" {
-		Error("Invalid config: please set 'private_key'")
-		RecommendKey()
-		isValid = false
-	}
 
 	// validate optional configs
 	if config.HostName == "" {
@@ -191,6 +183,11 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 		Success("Config is Valid")
 	} else {
 		Error("Config validation failed! please fix above issues")
+	}
+
+	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.Vault == "" {
+		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, or private_key")
+		isValid = false
 	}
 
 	return isValid
@@ -234,7 +231,6 @@ type SimplifiedConfig struct {
 	L2WebsocketURL               string
 	ProofSubmissionWebsocketURL  string
 	ProofSubmissionChainID       int64
-	PrivateKey                   *ecdsa.PrivateKey
 	AlertManagerAddress          ethCommon.Address
 	DiligenceProofManagerAddress ethCommon.Address
 	L2ExecRPCURL                 string
@@ -245,6 +241,10 @@ type SimplifiedConfig struct {
 	Retries                      int
 	ReceiptTimeout               int
 	GasPrice                     int64
+	WatchtowerAddress            ethCommon.Address
+	ExternalSignerEndpoint       string
+	Vault                        string
+	PrivateKey                   *ecdsa.PrivateKey
 }
 
 // `LoadConfigFromJson` returns a config object of type `WatchTowerConfig` by loading
@@ -272,20 +272,6 @@ func LoadConfigFromJson() *WatchTowerConfig {
 		Error(err)
 		os.Exit(123)
 	}
-
-	if Config.PrivateKeyHex == "" {
-		Error("Private key not set, please set the watchtower private key in the config and retry")
-		os.Exit(123)
-	}
-
-	privateKey, err := crypto.HexToECDSA(Config.PrivateKeyHex)
-	if err != nil {
-		Error(err)
-		os.Exit(123)
-	}
-	Config.PrivateKey = privateKey
-	// printConfig, err := json.MarshalIndent(Config, "", "  ")
-	// Success(string(printConfig))
 
 	Success("Read `config.json`")
 
@@ -321,7 +307,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		simpleConfig = new(SimplifiedConfig)
 	}
 
-	simpleConfig.PrivateKey = config.PrivateKey
+	simpleConfig.WatchtowerAddress = ethCommon.HexToAddress(config.WatchtowerAddress)
 	simpleConfig.AlertManagerAddress = ethCommon.HexToAddress(config.AlertManagerAddress)
 	simpleConfig.DiligenceProofManagerAddress = ethCommon.HexToAddress(config.DiligenceProofManagerAddress)
 	simpleConfig.Retries = config.Retries
@@ -329,6 +315,27 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	simpleConfig.GasPrice = config.GasPrice
 	simpleConfig.ProofSubmissionWebsocketURL = config.ProofSubmissionWebsocketURL
 	simpleConfig.ProofSubmissionChainID = int64(config.ProofSubmissionChainID)
+	simpleConfig.ExternalSignerEndpoint = config.ExternalSignerEndpoint
+	simpleConfig.Vault = config.Vault
+
+	if len(config.PrivateKey) > 0 {
+		key := config.PrivateKey
+		if config.PrivateKey[0:2] == "0x"{
+			key = config.PrivateKey[2:]
+		}
+		private_key, err := crypto.HexToECDSA(key)
+		if err != nil {
+			Fatal(err)
+		}
+		simpleConfig.PrivateKey = private_key
+		config.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey).Hex()
+		simpleConfig.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey)
+	}
+	
+	if len(config.WatchtowerAddress) != 0 {
+		simpleConfig.WatchtowerAddress = common.HexToAddress(config.WatchtowerAddress)
+	}
+
 
 	switch config.CurrentlyWatchingL1 {
 	case "eth":
@@ -399,11 +406,7 @@ func LoadWebServerConfig(config *WatchTowerConfig) *WebServerConfig {
 	webServerConfig.HostName = config.HostName
 	webServerConfig.Port = config.Port
 	webServerConfig.CurrentlyWatchingL2 = config.CurrentlyWatchingL2
-	publicKeyAddress, err := GetPublicKeyAddressFromPrivateKey(config.PrivateKey)
-	if err != nil {
-		Error(err)
-	}
-	webServerConfig.PublicKeyAddressHex = publicKeyAddress.Hex()
+	webServerConfig.PublicKeyAddressHex = config.WatchtowerAddress
 
 	return &webServerConfig
 

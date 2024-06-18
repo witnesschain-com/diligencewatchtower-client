@@ -1,12 +1,13 @@
 package watcher
 
 import (
-	"crypto/ecdsa"
 	"math/big"
 	"strconv"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
@@ -51,22 +52,16 @@ func ComputeProofOfDiligence(
 
 func SignProofOfDiligence(
 	proofOfDilegence []byte,
-	privateKey *ecdsa.PrivateKey,
+	watchtower common.Address,
+	vault *keystore.Vault,
 ) []byte {
+
 	hash := crypto.Keccak256Hash(proofOfDilegence)
 
-	prefix := []byte("\x19Ethereum Signed Message:\n32")
-	var hash_bytes []byte = hash.Bytes()
-
-	proofOfDilegenceToHash := append(prefix, hash_bytes...)
-	final_hash := crypto.Keccak256Hash(proofOfDilegenceToHash)
-
-	signatureOfProofOfDiligence, err := crypto.Sign(final_hash.Bytes(), privateKey)
+	signatureOfProofOfDiligence, err := vault.SignData(hash.Bytes())
 	if err != nil {
-		wtCommon.Fatal(err)
+		wtCommon.Error(err)
 	}
 
-	signatureOfProofOfDiligence[64] += 27 // XXX legacy reasons!
-	wtCommon.Success("Successfully signed Proof of Diligence")
 	return signatureOfProofOfDiligence
 }
