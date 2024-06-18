@@ -7,8 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
-	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
 func FetchIntermediateStateRoots(
@@ -55,19 +55,13 @@ func SignProofOfDiligence(
 	watchtower common.Address,
 	vault *keystore.Vault,
 ) []byte {
+
 	hash := crypto.Keccak256Hash(proofOfDilegence)
 
-	prefix := []byte("\x19Ethereum Signed Message:\n32")
-	var hash_bytes []byte = hash.Bytes()
-
-	proofOfDilegenceToHash := append(prefix, hash_bytes...)
-	final_hash := crypto.Keccak256Hash(proofOfDilegenceToHash)
-
-	signatureOfProofOfDiligence, err := vault.SignData(final_hash[:])
+	signatureOfProofOfDiligence, err := vault.SignData(hash.Bytes())
 	if err != nil {
 		wtCommon.Error(err)
 	}
 
-	wtCommon.Success("Successfully signed Proof of Diligence")
 	return signatureOfProofOfDiligence
 }
