@@ -44,4 +44,4 @@ jobs:
           context: ./src/client/
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: witnesschain/watchtower:latest , witnesschain/watchtower:${{ steps.version_tag.outputs.image_tag }}
+          tags: witnesschain/watchtower:${{ steps.version_tag.outputs.image_tag }}
