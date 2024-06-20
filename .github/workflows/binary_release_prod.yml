@@ -1,8 +1,8 @@
 name: CD - Binary Release
 
 on:
-  release:
-    types: [created]
+  # release:
+  #   types: [created]
   workflow_dispatch:
     inputs:
       tag:
