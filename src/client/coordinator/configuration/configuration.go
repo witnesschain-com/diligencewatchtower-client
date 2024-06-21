@@ -1,9 +1,12 @@
 package configuration
 
-import "crypto/ecdsa"
+import (
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
+)
 
 type CoordinatorConfiguration struct {
-	PrivateKey      *ecdsa.PrivateKey
-	PublicKeyHex    string
+	WatchtowerAddress      common.Address
+	Vault         *keystore.Vault
 	WatchingChainID string
 }

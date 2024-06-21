@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
 
 func TestProcessIntermediateBlocks(t *testing.T) {
@@ -87,7 +88,18 @@ func TestSignProofOfDiligence(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	signedProofOfDiligence := SignProofOfDiligence(proofOfDilegence, privateKey)
+	config := wtCommon.LoadConfigFromJson()
+	simpleConfig := wtCommon.LoadSimplifiedConfig(config, nil)
+
+	// override privateKey as config privateKey changes with time.
+	simpleConfig.PrivateKey = privateKey
+
+	vault, err := keystore.SetupVault(simpleConfig)
+	if err != nil {
+		panic(err)
+	}
+	
+	signedProofOfDiligence := SignProofOfDiligence(proofOfDilegence, simpleConfig.WatchtowerAddress, vault)
 
 	expectedSignedProofOfDiligence, err := hex.DecodeString("0059d9cf0369f80525bf01d7efa8833b090a9729176c8912a6b167300e8fb82d54d7edea0d3b64c68d1c0c48cab09b9621ede685deb2bff2d203130301a3e4701b")
 	if err != nil {

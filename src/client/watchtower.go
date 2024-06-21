@@ -22,6 +22,7 @@ import (
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	coordinator "github.com/witnesschain-com/diligencewatchtower-client/coordinator"
 	"github.com/witnesschain-com/diligencewatchtower-client/external"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
@@ -61,6 +62,17 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 
 	// read config
 	configData := wtCommon.LoadConfigFromJson()
+
+	simplifiedConfig := wtCommon.LoadSimplifiedConfig(configData, nil)
+
+	vault, err := keystore.SetupVault(simplifiedConfig)
+	if err != nil {
+		wtCommon.Error(err)
+	}
+
+	if len(configData.WatchtowerAddress) == 0 {
+		configData.WatchtowerAddress = vault.NewTransactOpts(nil).From.Hex()
+	}
 
 	// validate config valus are set correctly and that watchtower address is valid
 	if !wtCommon.PreStartupChecks(configData) {

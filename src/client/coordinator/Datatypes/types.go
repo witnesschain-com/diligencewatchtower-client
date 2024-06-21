@@ -1,11 +1,12 @@
 package datatypes
 
 import (
-	"crypto/ecdsa"
 	"encoding/json"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/jellydator/ttlcache/v3"
+	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
 
@@ -44,7 +45,8 @@ type TraceTxnResult struct {
 }
 
 type TracerDependencies struct {
-	Cache      *ttlcache.Cache[string, watcher.InclusionProof]
-	Config     wtCommon.SimplifiedConfig
-	PrivateKey *ecdsa.PrivateKey
+	Cache             *ttlcache.Cache[string, watcher.InclusionProof]
+	Config            wtCommon.SimplifiedConfig
+	WatchtowerAddress common.Address
+	Vault             *keystore.Vault
 }

@@ -1,0 +1,11 @@
+type: "file-raw"
+keyType: "SECP256K1"
+privateKey: "0x25b1166a43c109cb330af8945d364722757c65ed2bfed5444b5a2f057f82d391"
+---
+type: "aws-kms"
+authenticationMode: "SPECIFIED"
+accessKeyId: "acc_key_id"
+secretAccessKey: "foo"
+sessionToken: "sess_token"
+kmsKeyId: "bar"
+region: "us-east-2"
