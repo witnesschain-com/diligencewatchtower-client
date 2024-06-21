@@ -28,6 +28,7 @@ type WatchTowerConfig struct {
 	// L1 - ethereum RPC urls
 	PrivateKey                  string `json:"private_key"`
 	Vault                       string `json:"encrypted_vault_directory"`
+	GocryptfsDirectoryPath      string `json:"gocryptfs_directory_path"`
 	GocryptfsKeyName            string `json:"gocryptfs_key_name"`
 	EthWebsocketURL             string `json:"eth_websocket_url"`
 	EthTestnetWebsocketURL      string `json:"eth_testnet_websocket_url"`
@@ -342,6 +343,9 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		}
 		SetPrivateKey(key)
 	} else if len(config.GocryptfsKeyName) > 0 {
+		if len(config.GocryptfsDirectoryPath) > 0 {
+			opCommon.SetKeysPath(config.GocryptfsDirectoryPath)
+		}
 		opCommon.UseEncryptedKeys()
 		defer opCommon.Unmount()
 

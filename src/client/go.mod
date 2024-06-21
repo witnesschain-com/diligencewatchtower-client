@@ -54,7 +54,7 @@ require (
 	github.com/witnesschain-com/diligencewatchtower-client/L1 v0.0.0-00010101000000-000000000000 // indirect
 	github.com/witnesschain-com/diligencewatchtower-client/bindings v0.0.0-00010101000000-000000000000 // indirect
 	github.com/witnesschain-com/diligencewatchtower-client/contractutils v0.0.0-00010101000000-000000000000 // indirect
-	github.com/witnesschain-com/operator-cli v0.1.1-0.20240517152649-5cf07a911f04 // indirect
+	github.com/witnesschain-com/operator-cli v0.1.1-0.20240620133912-3518d3c5bff1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
