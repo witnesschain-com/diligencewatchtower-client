@@ -137,7 +137,7 @@ func do_tracing(
 
 // Subscribes to a L2OO's event logs emmitted on the node (L1)
 // params: waitgroup for go-routine synchronization and pointer to config
-func StartWatcher(
+func StartDiligenceWatcher(
 	wg *sync.WaitGroup,
 	configData *wtCommon.WatchTowerConfig,
 	simplifiedConfig *wtCommon.SimplifiedConfig,
@@ -161,7 +161,6 @@ func StartWatcher(
 
 	number_of_retries := 0
 
-	go StartInclusionWatcher(wg, globalConfigData)
 	for {
 
 		if parsed_output != nil {

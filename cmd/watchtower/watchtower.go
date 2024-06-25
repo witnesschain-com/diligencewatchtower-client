@@ -89,6 +89,11 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 		}
 	}()
 
+	for {
+		Run(configData, simplifiedConfig)
+		wtCommon.Error("Restarting watchtower...............")
+	}
+
 }
 
 func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.SimplifiedConfig) bool {
@@ -116,7 +121,8 @@ func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.Simpl
 	)
 
 	// run watcher as goroutines and wait using the wait group
-	go watcher.StartWatcher(&waitGroup, configData, simplifiedConfig, configChan)
+	go watcher.StartDiligenceWatcher(&waitGroup, configData, simplifiedConfig, configChan)
+	go watcher.StartInclusionWatcher(&waitGroup, simplifiedConfig)
 	wtCommon.Success("WitnessChain Watchtower started!")
 
 	// wait for the 1 process to end (watchtower to stop)

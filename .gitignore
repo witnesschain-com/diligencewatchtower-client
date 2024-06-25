@@ -1,3 +1,4 @@
 web3signer.yaml
 config.json
 cmd/watchtower/watchtower
+cmd/pod/pod
