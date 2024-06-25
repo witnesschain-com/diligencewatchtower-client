@@ -226,13 +226,12 @@ func Fatal(message any) bool {
 
 	// send the error if alert url is set
 	currentConfig := LoadConfigFromJson()
-	simpleConfig := LoadSimplifiedConfig(currentConfig, nil)
 
 	if currentConfig.AlertURL != "" {
 
-		message := fmt.Sprintf("watchtower_id: %v\nfrom: %v\ntimestamp: %v\nfile: %v\nline: %vmessage: %v\n", simpleConfig.WatchtowerAddress, from, now, file, line, fatalErrorMessageString)
-		
-		request, _ := json.Marshal(map[string] interface{}{
+		message := fmt.Sprintf("watchtower_id: %v\nfrom: %v\ntimestamp: %v\nfile: %v\nline: %vmessage: %v\n", currentConfig.WatchtowerAddress, from, now, file, line, fatalErrorMessageString)
+
+		request, _ := json.Marshal(map[string]interface{}{
 			"text": message,
 		})
 

@@ -72,5 +72,8 @@
       "operator_registry"                    : "0x26710e60A36Ace8A44e1C3D7B33dc8B80eAb6cb7",
       "receipt_timeout"                      : 300,
       "watchtower_retries"                   : 5,
-      "external_signer_endpoint"             : "http://localhost:9000"
+      "external_signer_endpoint"             : "http://localhost:9000",
+      "gocryptfs_directory_path"             : "",    "// TODO" : "set the path of the .encrypted_keys and .decrypted_keys directories where your keys exists",
+                                                             "" : "(this is optional, if it is empty, these directories will be searched in the path of the executable)",
+      "gocryptfs_key_name"                   : "",    "// TODO" : "set the private key name used for the watchtower key in gocryptfs (this is optional)"
 }

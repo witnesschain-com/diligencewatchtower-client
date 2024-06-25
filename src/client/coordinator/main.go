@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/gorilla/websocket"
 	"github.com/jellydator/ttlcache/v3"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
@@ -46,28 +45,23 @@ const (
 	CACHE_EXPIRY      = 2 * time.Minute
 )
 
-func getWatchingChainID(cfg wtCommon.WatchTowerConfig) string {
-	watchingL2 := cfg.CurrentlyWatchingL2
-	chainList := cfg.L2.OPChains
-	for _, chain := range chainList {
-		if chain.Name == watchingL2 {
-			return strconv.Itoa(chain.ChainID)
-		}
+func getWatchingChainID(simpleConfig wtCommon.SimplifiedConfig) string {
+	if simpleConfig.CurrentL2ChainID != 0 {
+		return strconv.Itoa(int(simpleConfig.CurrentL2ChainID))
 	}
 	return ""
 }
 
-func StartCoordinator(config wtCommon.WatchTowerConfig) {
-	simpleConfig := wtCommon.LoadSimplifiedConfig(&config, nil)
+func StartCoordinator(simpleConfig wtCommon.SimplifiedConfig) {
 	client := auth.CoordinatorClient{}
-	if chainId := getWatchingChainID(config); chainId != "" {
-		err := client.Initialize(config.WitnesschainCoordinatorUrl, common.HexToAddress(config.WatchtowerAddress), chainId, simpleConfig)
+	if chainId := getWatchingChainID(simpleConfig); chainId != "" {
+		err := client.Initialize(simpleConfig.WitnesschainCoordinatorURL, simpleConfig.WatchtowerAddress, chainId, &simpleConfig)
 		if err != nil {
 			wtCommon.Error(err)
 			return
 		}
 	} else {
-		wtCommon.Error("ChainID not found for " + config.CurrentlyWatchingL2)
+		wtCommon.Error("ChainID not found for " + simpleConfig.CurrentL2Chain)
 		return
 	}
 
@@ -96,21 +90,21 @@ func StartCoordinator(config wtCommon.WatchTowerConfig) {
 	)
 	go cache.Start()
 
-	Vault, err := keystore.SetupVault(simpleConfig)
+	Vault, err := keystore.SetupVault(&simpleConfig)
 	if err != nil {
 		wtCommon.Error(err)
 	}
 
 	dependencies := datatypes.TracerDependencies{
 		Cache:             cache,
-		Config:            *simpleConfig,
-		WatchtowerAddress: common.HexToAddress(config.WatchtowerAddress),
+		Config:            simpleConfig,
+		WatchtowerAddress: simpleConfig.WatchtowerAddress,
 		Vault:             Vault,
 	}
 
 	var DataChannel = make(chan string, 5000)
 
-	go HandleMessages(&wsHandler, DataChannel, dependencies, simpleConfig, client)
+	go HandleMessages(&wsHandler, DataChannel, dependencies, &simpleConfig, client)
 	go Heartbeat(wsHandler.Connection)
 	err = wsHandler.ListenForMessages(DataChannel)
 	wtCommon.Error(err)

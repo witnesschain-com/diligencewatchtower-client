@@ -16,9 +16,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	opCommon "github.com/witnesschain-com/operator-cli/common"
 )
 
 // WatchTowerConfig is used to store all the configurable parameters
@@ -27,6 +27,8 @@ type WatchTowerConfig struct {
 	// L1 - ethereum RPC urls
 	PrivateKey                  string `json:"private_key"`
 	Vault                       string `json:"encrypted_vault_directory"`
+	GocryptfsDirectoryPath      string `json:"gocryptfs_directory_path"`
+	GocryptfsKeyName            string `json:"gocryptfs_key_name"`
 	EthWebsocketURL             string `json:"eth_websocket_url"`
 	EthTestnetWebsocketURL      string `json:"eth_testnet_websocket_url"`
 	ProofSubmissionWebsocketURL string `json:"proof_submission_chain_url"`
@@ -39,10 +41,10 @@ type WatchTowerConfig struct {
 	CurrentlyWatchingL2 string `json:"currently_watching_l2"`
 
 	// keys and tuning
-	WatchtowerAddress          string `json:"watchtower_address"`
-	Retries        int   `json:"watchtower_retries"`
-	ReceiptTimeout int   `json:"receipt_timeout"`
-	GasPrice       int64 `json:"gas_price"`
+	WatchtowerAddress string `json:"watchtower_address"`
+	Retries           int    `json:"watchtower_retries"`
+	ReceiptTimeout    int    `json:"receipt_timeout"`
+	GasPrice          int64  `json:"gas_price"`
 
 	// Webserver/API params
 	HostName                   string `json:"host_name"`
@@ -185,8 +187,8 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 		Error("Config validation failed! please fix above issues")
 	}
 
-	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.Vault == "" {
-		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, or private_key")
+	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.Vault == "" && config.GocryptfsKeyName == "" {
+		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, gocryptfs_key_name or private_key")
 		isValid = false
 	}
 
@@ -230,12 +232,15 @@ type SimplifiedConfig struct {
 	L1WebsocketURL               string
 	L2WebsocketURL               string
 	ProofSubmissionWebsocketURL  string
+	WitnesschainCoordinatorURL   string
 	ProofSubmissionChainID       int64
 	AlertManagerAddress          ethCommon.Address
 	DiligenceProofManagerAddress ethCommon.Address
+	OperatorRegistryAddress      ethCommon.Address
 	L2ExecRPCURL                 string
 	L2NodeRPCURL                 string
 	StateCommitmentAddress       ethCommon.Address
+	CurrentL2Chain               string
 	CurrentL2ChainID             int64
 	CurrentL1ChainID             int64
 	Retries                      int
@@ -310,19 +315,17 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	simpleConfig.WatchtowerAddress = ethCommon.HexToAddress(config.WatchtowerAddress)
 	simpleConfig.AlertManagerAddress = ethCommon.HexToAddress(config.AlertManagerAddress)
 	simpleConfig.DiligenceProofManagerAddress = ethCommon.HexToAddress(config.DiligenceProofManagerAddress)
+	simpleConfig.OperatorRegistryAddress = ethCommon.HexToAddress(config.OperatorRegistry)
 	simpleConfig.Retries = config.Retries
 	simpleConfig.ReceiptTimeout = config.ReceiptTimeout
 	simpleConfig.GasPrice = config.GasPrice
+	simpleConfig.WitnesschainCoordinatorURL = config.WitnesschainCoordinatorUrl
 	simpleConfig.ProofSubmissionWebsocketURL = config.ProofSubmissionWebsocketURL
 	simpleConfig.ProofSubmissionChainID = int64(config.ProofSubmissionChainID)
 	simpleConfig.ExternalSignerEndpoint = config.ExternalSignerEndpoint
 	simpleConfig.Vault = config.Vault
 
-	if len(config.PrivateKey) > 0 {
-		key := config.PrivateKey
-		if config.PrivateKey[0:2] == "0x"{
-			key = config.PrivateKey[2:]
-		}
+	SetPrivateKey := func(key string) {
 		private_key, err := crypto.HexToECDSA(key)
 		if err != nil {
 			Fatal(err)
@@ -331,11 +334,30 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		config.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey).Hex()
 		simpleConfig.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey)
 	}
-	
-	if len(config.WatchtowerAddress) != 0 {
-		simpleConfig.WatchtowerAddress = common.HexToAddress(config.WatchtowerAddress)
+
+	if len(config.PrivateKey) > 0 {
+		key := config.PrivateKey
+		if config.PrivateKey[0:2] == "0x" {
+			key = config.PrivateKey[2:]
+		}
+		SetPrivateKey(key)
+	} else if len(config.GocryptfsKeyName) > 0 {
+		if len(config.GocryptfsDirectoryPath) > 0 {
+			opCommon.SetKeysPath(config.GocryptfsDirectoryPath)
+		}
+		opCommon.UseEncryptedKeys()
+		defer opCommon.Unmount()
+
+		key := opCommon.GetPrivateKeyFromFile(config.GocryptfsKeyName)
+		if key[0:2] == "0x" {
+			key = key[2:]
+		}
+		SetPrivateKey(key)
 	}
 
+	if len(config.WatchtowerAddress) != 0 {
+		simpleConfig.WatchtowerAddress = ethCommon.HexToAddress(config.WatchtowerAddress)
+	}
 
 	switch config.CurrentlyWatchingL1 {
 	case "eth":
@@ -357,6 +379,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 			simpleConfig.L2NodeRPCURL = chain.NodeRPCURL
 			simpleConfig.StateCommitmentAddress = ethCommon.HexToAddress(chain.L2OOAddress)
 			simpleConfig.CurrentL2ChainID = int64(chain.ChainID)
+			simpleConfig.CurrentL2Chain = chain.Name
 			chainParamsSet = true
 		}
 	}
