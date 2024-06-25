@@ -74,7 +74,9 @@ func StartCoordinator(simpleConfig wtCommon.SimplifiedConfig) {
 	}
 	if !ok {
 		return
-	}
+	} 
+
+	wtCommon.Success("Authentication Successful")
 
 	headers := client.GetHeaders()
 	wsHandler := ws.WebsocketClient{}
