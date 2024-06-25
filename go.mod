@@ -74,7 +74,7 @@ replace github.com/witnesschain-com/diligencewatchtower-client/L1 => ./L1
 
 replace github.com/witnesschain-com/diligencewatchtower-client/common => ./common
 
-replace github.com/witnesschain-com/diligencewatchtower-client/contractutils => ./contract_utils
+replace github.com/witnesschain-com/diligencewatchtower-client/contractutils => ./contractutils
 
 replace github.com/witnesschain-com/diligencewatchtower-client/bindings => ./bindings
 
