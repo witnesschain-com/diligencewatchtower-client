@@ -13,8 +13,8 @@ import (
 func main() {
 	var configPath string
 	app := &cli.App{
-		Name:  "diligencewatchtower-client Proof of Diligence",
-		Usage: "Proof of Diligence for rollup networks",
+		Name:  "diligencewatchtower-client Proof of Inclusion",
+		Usage: "Proof of Inclusion for rollup networks",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name: "config",
@@ -34,8 +34,7 @@ func main() {
 			var wg sync.WaitGroup
 			wg.Add(1)
 
-			configChan := make(chan bool, 1)
-			watcher.StartDiligenceWatcher(&wg, configData, simplifiedConfig, configChan)
+			watcher.StartInclusionWatcher(&wg, simplifiedConfig)
 
 			wg.Wait()
 
@@ -47,4 +46,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
