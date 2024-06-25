@@ -33,7 +33,7 @@ func ValidateWatchtowerAddress(simplifiedConfig *SimplifiedConfig) bool {
 	} else if isValid {
 		Success("Watchtower: " + simplifiedConfig.WatchtowerAddress.Hex() + " is registered with WitnessChain")
 	} else {
-		Error("Watchtower" + simplifiedConfig.WatchtowerAddress.Hex() + "address is invalid, please ensure that your watchtower's eth address is registered with WitnessChain")
+		Error("Watchtower " + simplifiedConfig.WatchtowerAddress.Hex() + " address is invalid, please ensure that your watchtower's eth address is registered with WitnessChain")
 		return false
 	}
 

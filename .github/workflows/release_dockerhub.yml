@@ -1,6 +1,8 @@
-name: cd - client docker hub release (dev)
+name: cd - client docker hub release
 
 on:
+  release:
+    types: [created]
   workflow_dispatch: 
   
 jobs:
@@ -15,17 +17,26 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       -
         name: Checkout
         uses: actions/checkout@v3
-
+      
+      -
+        name: Test log release version
+        id: version_tag
+        run: |
+          full_tag_name=${{ github.event.release.tag_name }}
+          tag_without_v=${full_tag_name#"v"}
+          echo "image_tag=${tag_without_v}" >> $GITHUB_OUTPUT
+  
       -
         name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       -
         name: Build and push
         uses: docker/build-push-action@v5
@@ -33,4 +44,4 @@ jobs:
           context: ./src/client/
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: witnesschain/watchtower:dev
+          tags: witnesschain/watchtower:${{ steps.version_tag.outputs.image_tag }}

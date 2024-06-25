@@ -1,10 +1,14 @@
-name: cd - client docker hub release
+name: Dev Release
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: #initial trigger
+        - 'chores/watchtower_patch' 
   workflow_dispatch: 
-  
+    inputs:
+      watchtower_version:
+        type: string
+        default: v1.0.1-internal
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -23,19 +27,11 @@ jobs:
         uses: actions/checkout@v3
       
       -
-        name: Test log release version
-        id: version_tag
-        run: |
-          full_tag_name=${{ github.event.release.tag_name }}
-          tag_without_v=${full_tag_name#"v"}
-          echo "image_tag=${tag_without_v}" >> $GITHUB_OUTPUT
-  
-      -
         name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }} #token
 
       -
         name: Build and push
@@ -44,4 +40,5 @@ jobs:
           context: ./src/client/
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: witnesschain/watchtower:latest , witnesschain/watchtower:${{ steps.version_tag.outputs.image_tag }}
+          build-args: WATCHTOWER_VERISON=${{inputs.watchtower_version}}
+          tags: witnesschain/watchtower:dev

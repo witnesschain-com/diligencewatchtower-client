@@ -12,6 +12,7 @@ import (
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	datatypes "github.com/witnesschain-com/diligencewatchtower-client/coordinator/Datatypes"
 	auth "github.com/witnesschain-com/diligencewatchtower-client/coordinator/auth"
+	"github.com/witnesschain-com/diligencewatchtower-client/coordinator/core"
 	ws "github.com/witnesschain-com/diligencewatchtower-client/coordinator/core"
 	wtInterface "github.com/witnesschain-com/diligencewatchtower-client/coordinator/interfaces"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
@@ -76,7 +77,7 @@ func StartCoordinator(simpleConfig wtCommon.SimplifiedConfig) {
 	}
 
 	headers := client.GetHeaders()
-	wsHandler := ws.WebsockerClient{}
+	wsHandler := ws.WebsocketClient{}
 
 	err = wsHandler.ConnectToCoordinator(headers)
 	if err != nil {
@@ -103,7 +104,7 @@ func StartCoordinator(simpleConfig wtCommon.SimplifiedConfig) {
 
 	var DataChannel = make(chan string, 5000)
 
-	go HandleMessages(wsHandler.Connection, DataChannel, dependencies, &simpleConfig)
+	go HandleMessages(&wsHandler, DataChannel, dependencies, &simpleConfig, client)
 	go Heartbeat(wsHandler.Connection)
 	err = wsHandler.ListenForMessages(DataChannel)
 	wtCommon.Error(err)
@@ -111,7 +112,7 @@ func StartCoordinator(simpleConfig wtCommon.SimplifiedConfig) {
 
 }
 
-func HandleMessages(connection *websocket.Conn, channel chan string, deps datatypes.TracerDependencies, config *wtCommon.SimplifiedConfig) {
+func HandleMessages(ws *core.WebsocketClient, channel chan string, deps datatypes.TracerDependencies, config *wtCommon.SimplifiedConfig, client auth.CoordinatorClient) {
 	var lastTxn string
 	var lastChainID string
 	signer, err := keystore.SetupVault(config)
@@ -119,6 +120,7 @@ func HandleMessages(connection *websocket.Conn, channel chan string, deps dataty
 		wtCommon.Error(err)
 	}
 
+	connection := ws.Connection
 	for {
 		data := <-channel
 		wsRequest, err := handleWsJson(data)
@@ -144,21 +146,27 @@ func HandleMessages(connection *websocket.Conn, channel chan string, deps dataty
 					Result:          string(payloadBytes),
 					Signature:       signature,
 				}
-
-				logData, err := json.Marshal(coordinatorResp)
+				restApiData, err := json.Marshal(coordinatorResp)
 				if err != nil {
-					wtCommon.Error(err)
-				} else {
-					cutoff := len(string(logData))
-					if cutoff > 50 {
-						cutoff = 50
-					}
-					wtCommon.Info(fmt.Sprintf("WS:SEN Type[%d] Content[%s]", websocket.TextMessage, string(logData)))
+					wtCommon.Error(fmt.Sprintf("Unable to marshall coordinator response: %v", err))
+				}
 
-					err = connection.WriteJSON(coordinatorResp)
-					if err != nil {
+				wsSuccessful := true
+				wtCommon.Info("WS: Submitting txn-tracer results..")
+				if coordinatorResp.Size() < ws.GetWriteBufferSize() {
+					if err := handleWebsocketResultSubmission(connection, coordinatorResp); err != nil {
 						wtCommon.Error(err)
+						wsSuccessful = false
 						break
+					}
+
+				}
+				if !wsSuccessful {
+					// 5 retries
+					for i := 0; i < 5; i++ {
+						if err := handleRestApiSubmission(client, restApiData); err == nil {
+							break
+						}
 					}
 				}
 			}
@@ -166,6 +174,26 @@ func HandleMessages(connection *websocket.Conn, channel chan string, deps dataty
 
 	}
 	wtCommon.Warning("Terminating message handler")
+}
+
+func handleWebsocketResultSubmission(connection *websocket.Conn, coordinatorResp datatypes.WSTracerResponse) error {
+	err := connection.WriteJSON(coordinatorResp)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func handleRestApiSubmission(client auth.CoordinatorClient, data []byte) error {
+	statusCode, err := client.SubmitResult(data)
+	if statusCode == 200 {
+		wtCommon.Success("Submitted result to coordinator")
+	}
+	if err != nil {
+		wtCommon.Error(err)
+		return err
+	}
+	return nil
 }
 
 func Heartbeat(connection *websocket.Conn) {
@@ -191,6 +219,10 @@ func handleWsJson(data string) (*datatypes.WSRequestData, error) {
 	err := json.Unmarshal(bytes, &m)
 	if err != nil {
 		return nil, err
+	}
+
+	if m.(map[string]interface{})["messageType"].(string) == "error" {
+		wtCommon.Error(m.(map[string]interface{})["error"].(map[string]interface{})["message"].(string))
 	}
 
 	return &datatypes.WSRequestData{

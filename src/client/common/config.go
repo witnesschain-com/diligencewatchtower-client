@@ -16,7 +16,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	opCommon "github.com/witnesschain-com/operator-cli/common"
@@ -357,7 +356,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	}
 
 	if len(config.WatchtowerAddress) != 0 {
-		simpleConfig.WatchtowerAddress = common.HexToAddress(config.WatchtowerAddress)
+		simpleConfig.WatchtowerAddress = ethCommon.HexToAddress(config.WatchtowerAddress)
 	}
 
 	switch config.CurrentlyWatchingL1 {

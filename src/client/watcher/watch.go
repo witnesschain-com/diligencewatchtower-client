@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"sync"
 
-	// "github.com/ethereum/go-ethereum/accounts"
 	"github.com/witnesschain-com/diligencewatchtower-client/L1"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"

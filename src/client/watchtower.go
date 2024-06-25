@@ -13,6 +13,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -26,10 +27,13 @@ import (
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
 )
 
-const version = "v1.0"
+var VERSION = "undefined"
+
 const sleepTimeIfNoChainAssigned = 5 * time.Second
 
 func main() {
+	parseArgs(os.Args[1:])
+
 	fmt.Print(`
                            ___
                     o___.-'  /
@@ -75,7 +79,7 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 		configData.WatchtowerAddress = vault.NewTransactOpts(nil).From.Hex()
 	}
 
-	wtCommon.Info("Starting Watchtower (" + version + ") ...")
+	wtCommon.Info("Starting Watchtower (" + VERSION + ") ...")
 
 	// setup EL monitoring and nodeAPI
 	external.InitialiseELMonitoring()
@@ -93,6 +97,32 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 		Run(configData, simplifiedConfig, nodeApi)
 	}
 
+}
+
+// use a Parser Object as a return type for continued execution
+func parseArgs(arguments []string) {
+	if len(arguments) > 0 {
+		for index, arg := range arguments {
+			// use index with _getArgValue to get the corresponding value for the particular parameter.
+			_ = index
+			switch arg {
+			case "-v", "--version":
+				fmt.Println(VERSION)
+				os.Exit(0)
+			default:
+				fmt.Printf("unknown option: %s", arg)
+				os.Exit(1)
+			}
+		}
+
+	}
+}
+
+func _getArgValue(args []string, index int) string {
+	if index+1 >= len(args) {
+		return ""
+	}
+	return args[index+1]
 }
 
 func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.SimplifiedConfig, nodeApi *nodeapi.NodeApi) bool {

@@ -2,13 +2,14 @@
   
 FROM golang:1.20 as stage-build
 
+ARG WATCHTOWER_VERSION
 WORKDIR /watchtower/src/client/
 
 COPY . ./
 RUN go mod download
 
 
-RUN go build .
+RUN go build -o watchtower .
 RUN chmod +x ./rundocker.sh
 
 FROM debian:stable 
