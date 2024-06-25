@@ -26,11 +26,11 @@ do
 		chmod 400 https-privkey.pem
 	fi
 
-	if [ -e "./watchtower" ]
+	if [ -e "./cmd/watchtower/watchtower" ]
 	then
-		./watchtower
+		./cmd/watchtower/watchtower
 	else
-		go run .
+		cd cmd/watchtower && go run .
 	fi
 
 	if [ "$?" = "123" ] # some error
