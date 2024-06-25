@@ -37,10 +37,10 @@ To get started with the Watchtower Client, please follow the instructions below
     git clone https://github.com/witnesschain-com/diligencewatchtower-client.git
     ```
 
-2. Move to the `client` directory
+2. Move to the `diligencewatchtower-client/cmd/watchtower` directory
 
     ```
-    cd diligencewatchtower-client/src/client
+    cd diligencewatchtower-client/cmd/watchtower`
     ```
 
 3. Building
