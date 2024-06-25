@@ -13,15 +13,12 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
-	"github.com/Layr-Labs/eigensdk-go/nodeapi"
 
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	coordinator "github.com/witnesschain-com/diligencewatchtower-client/coordinator"
-	"github.com/witnesschain-com/diligencewatchtower-client/external"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
@@ -31,8 +28,7 @@ var VERSION = "undefined"
 
 const sleepTimeIfNoChainAssigned = 5 * time.Second
 
-func main() {
-	parseArgs(os.Args[1:])
+func Start(configPath string) {
 
 	fmt.Print(`
                            ___
@@ -61,7 +57,9 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 	fmt.Println("")
 
 	// read config
-	configData := wtCommon.LoadConfigFromJson()
+	configData := wtCommon.LoadConfigFromJson(configPath)
+	
+	
 
 	simplifiedConfig := wtCommon.LoadSimplifiedConfig(configData, nil)
 
@@ -82,8 +80,6 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 	wtCommon.Info("Starting Watchtower (" + VERSION + ") ...")
 
 	// setup EL monitoring and nodeAPI
-	external.InitialiseELMonitoring()
-	nodeApi := external.InitialiseNodeAPIWithLogger(configData)
 
 	go func() {
 		for {
@@ -93,39 +89,9 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 		}
 	}()
 
-	for {
-		Run(configData, simplifiedConfig, nodeApi)
-	}
-
 }
 
-// use a Parser Object as a return type for continued execution
-func parseArgs(arguments []string) {
-	if len(arguments) > 0 {
-		for index, arg := range arguments {
-			// use index with _getArgValue to get the corresponding value for the particular parameter.
-			_ = index
-			switch arg {
-			case "-v", "--version":
-				fmt.Println(VERSION)
-				os.Exit(0)
-			default:
-				fmt.Printf("unknown option: %s", arg)
-				os.Exit(1)
-			}
-		}
-
-	}
-}
-
-func _getArgValue(args []string, index int) string {
-	if index+1 >= len(args) {
-		return ""
-	}
-	return args[index+1]
-}
-
-func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.SimplifiedConfig, nodeApi *nodeapi.NodeApi) bool {
+func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.SimplifiedConfig) bool {
 	watchingChain := ""
 
 	// channel used by webserver to alert watchtower about changes to config.json
@@ -149,11 +115,6 @@ func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.Simpl
 		configChan,
 	)
 
-	err := nodeApi.UpdateServiceStatus(webServerConfig.PublicKeyAddressHex, nodeapi.ServiceStatusUp)
-	if err != nil {
-		wtCommon.Error(err)
-	}
-
 	// run watcher as goroutines and wait using the wait group
 	go watcher.StartWatcher(&waitGroup, configData, simplifiedConfig, configChan)
 	wtCommon.Success("WitnessChain Watchtower started!")
@@ -163,11 +124,6 @@ func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.Simpl
 
 	// watchtower stopped, irrespective of why, stop the webserver too
 	webserver.Stop(server)
-
-	err = nodeApi.UpdateServiceStatus(webServerConfig.PublicKeyAddressHex, nodeapi.ServiceStatusDown)
-	if err != nil {
-		wtCommon.Error(err)
-	}
 
 	if len(watchingChain) == 0 {
 		wtCommon.Info("Sleeping for 5 seconds ...\n")

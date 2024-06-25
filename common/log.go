@@ -22,6 +22,8 @@ import (
 	"time"
 )
 
+var ConfigPath string
+
 func StartBlock(message string) {
 
 	pc, file, line, ok := runtime.Caller(1)
@@ -225,7 +227,7 @@ func Fatal(message any) bool {
 	fmt.Printf("%20s │ %s │ \x1B[31m⚠ [@%s:%d] - %v\x1B[0m\n", from, now, file, line, message)
 
 	// send the error if alert url is set
-	currentConfig := LoadConfigFromJson()
+	currentConfig := LoadConfigFromJson(ConfigPath)
 
 	if currentConfig.AlertURL != "" {
 

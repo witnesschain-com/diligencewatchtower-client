@@ -164,25 +164,6 @@ func StartWatcher(
 	go StartInclusionWatcher(wg, globalConfigData)
 	for {
 
-		if len(configChan) != 0 {
-
-			restart := <-configChan
-
-			wtCommon.Info("WatchTower configuration has been updated; applying the updates ...")
-			configData = wtCommon.LoadConfigFromJson()
-			wtCommon.Success("Reloaded the new configuration from `wtCommon.json`")
-
-			globalConfigData = wtCommon.LoadSimplifiedConfig(configData, globalConfigData)
-			if restart {
-				eth_sub.Unsubscribe()
-				close(eth_logs)
-				_, eth_sub, eth_logs, err = L1.ListenForProposals(globalConfigData)
-				if err != nil {
-					wtCommon.Fatal(err)
-				}
-			}
-		}
-
 		if parsed_output != nil {
 
 			// there was something to be processed but we crashed

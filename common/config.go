@@ -254,10 +254,11 @@ type SimplifiedConfig struct {
 
 // `LoadConfigFromJson` returns a config object of type `WatchTowerConfig` by loading
 // the values from the locally present `config.json` file
-func LoadConfigFromJson() *WatchTowerConfig {
+func LoadConfigFromJson(configPath string) *WatchTowerConfig {
+	ConfigPath = configPath
 
 	Info("Reading the config from `config.json` ...")
-	configFile, err := os.Open("config.json")
+	configFile, err := os.Open(configPath)
 	if err != nil {
 		Error(err)
 		os.Exit(123)
