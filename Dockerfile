@@ -9,7 +9,7 @@ COPY . ./
 RUN go mod download
 
 RUN ls
-RUN go build -o watchtower -ldflags="-X 'main.VERSION=${WATCHTOWER_VERSION}'" . 
+RUN go build -o watchtower -ldflags="-X 'main.VERSION=${WATCHTOWER_VERSION}'" 
 RUN echo "Completed build1"
 
 
