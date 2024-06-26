@@ -9,8 +9,9 @@ COPY . ./
 RUN go mod download
 
 
-RUN go build -o watchtower .
-RUN chmod +x ./rundocker.sh
+RUN go build -o watchtower -ldflags="-X 'main.VERSION=${WATCHTOWER_VERSION}'" . 
+RUN echo "Completed build1"
+
 
 FROM debian:stable 
 WORKDIR /watchtower/src/client
@@ -25,4 +26,5 @@ COPY LICENSE /
 RUN apt update && apt install certbot curl -y
 RUN chmod +x ./rundocker.sh
 COPY --from=stage-build /watchtower/src/client/watchtower .
+RUN echo "Completed build2"
 CMD ["./rundocker.sh"]
