@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
   
-FROM golang:1.20 as stage-build
+FROM golang:1.22.1 as stage-build
 
 ARG WATCHTOWER_VERSION
 WORKDIR /watchtower/src/client/
