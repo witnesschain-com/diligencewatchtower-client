@@ -82,7 +82,7 @@ jobs:
           prerelease: ${{ github.event.inputs.release_type }}
           body_path: ./release_notes/RELEASE.md
           files: |
-            ./watchtower_bin/watchtower_linux-armd64
+            ./watchtower_bin/watchtower_linux-amd64
             ./watchtower_bin/watchtower_darwin-arm64
       
       -
@@ -104,5 +104,5 @@ jobs:
           prerelease: ${{ github.event.release.prerelease}}
           body_path: ./release_notes/RELEASE.md
           files: |
-            ./watchtower_bin/watchtower_linux-armd64
+            ./watchtower_bin/watchtower_linux-amd64
             ./watchtower_bin/watchtower_darwin-arm64
