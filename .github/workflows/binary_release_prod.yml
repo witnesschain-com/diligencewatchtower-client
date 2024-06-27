@@ -77,7 +77,7 @@ jobs:
         uses: softprops/action-gh-release@v0.1.15
         with:
           repository: witnesschain-com/diligencewatchtower-client
-          token: ${{ secrets.WATCHTOWER_REPO_ACCESS_TOKEN }}
+          token: ${{ github.token }}
           tag_name: ${{ github.event.inputs.tag }}
           prerelease: ${{ github.event.inputs.release_type }}
           body_path: ./release_notes/RELEASE.md
@@ -99,7 +99,7 @@ jobs:
         uses: softprops/action-gh-release@v0.1.15
         with:
           repository: witnesschain-com/diligencewatchtower-client
-          token: ${{ secrets.WATCHTOWER_REPO_ACCESS_TOKEN }}
+          token: ${{ github.token }}
           tag_name: ${{ steps.version_tag.outputs.release_tag }}
           prerelease: ${{ github.event.release.prerelease}}
           body_path: ./release_notes/RELEASE.md
