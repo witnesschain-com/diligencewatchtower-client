@@ -102,7 +102,7 @@ jobs:
           token: ${{ github.token }}
           tag_name: ${{ steps.version_tag.outputs.release_tag }}
           prerelease: ${{ github.event.release.prerelease}}
-          body_path: ./release_notes/RELEASE.md
+          body_path: ./RELEASE.md
           files: |
             ./watchtower_bin/watchtower_linux-amd64
             ./watchtower_bin/watchtower_darwin-arm64
