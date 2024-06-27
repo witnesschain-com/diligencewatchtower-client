@@ -1,18 +1,12 @@
-## [1.0.0]
+## [1.1.0-rc1]
 
-This release focus on stability, security improvements, and bug fixes. 
+This release add support to store watchtower keys in encrypted format to 
+protect the keys when not in use. It uses 
+[gocryptfs](https://github.com/rfjakob/gocryptfs) to store keys in 
+encrypted format and decrypt the keys at run time.
 
-### Upgrade Steps
-* Delete the old container images.
-```
-docker rm <stale_container_id>
-docker rmi -f <stale_image_name>
-```
-* Download and run diligencewatchtower-cli with latest latest release 
-  tag.
-```
-docker run https://hub.docker.com/r/witnesschain/watchtower:1.0.0
-```
+:whale: DockerHub 
+[witnesschain/watchtower:1.1.0-rc1](https://hub.docker.com/r/witnesschain/watchtower/tags)
 
 
 For support or to report issues, please visit our [https://github.com/witnesschain-com/diligencewatchtower-client](https://github.com/witnesschain-com/diligencewatchtower-client) and [create a new issue](https://github.com/witnesschain-com/diligencewatchtower-client/issues).
