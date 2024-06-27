@@ -23,7 +23,7 @@ func SubmitProofToAlertManager(
 
 	// get a persistent websocket connection to L1 chain node
 	L1Client, err := wtCommon.GetConnection(
-		config.ProofSubmissionWebsocketURL,
+		config.L1WebsocketURL,
 		config.Retries,
 	)
 	if err != nil {
