@@ -187,7 +187,7 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 	}
 
 	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.Vault == "" && config.GocryptfsKey == "" {
-		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, gocryptfs_key_name or private_key")
+		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, gocryptfs_key or private_key")
 		isValid = false
 	}
 
@@ -342,10 +342,10 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		}
 		SetPrivateKey(key)
 	} else if len(config.GocryptfsKey) > 0 {
+		opCommon.ProcessConfigKeyPath(config.GocryptfsKey)
 		opCommon.UseEncryptedKeys()
 		defer opCommon.Unmount()
-		opCommon.ProcessConfigKeyPath(config.GocryptfsKey)
-		key := opCommon.GetPrivateKeyFromFile(config.GocryptfsKey)
+		key := opCommon.GetPrivateKey(config.GocryptfsKey)
 		if key[0:2] == "0x" {
 			key = key[2:]
 		}
