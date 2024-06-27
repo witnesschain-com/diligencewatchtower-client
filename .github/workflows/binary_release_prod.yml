@@ -72,6 +72,7 @@ jobs:
         uses: actions/download-artifact@v3
 
 
+
       - name: GH Release | Manual 
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: softprops/action-gh-release@v0.1.15
@@ -85,8 +86,7 @@ jobs:
             ./watchtower_bin/watchtower_linux-amd64
             ./watchtower_bin/watchtower_darwin-arm64
       
-      -
-        name: Test log release version
+      - name: Test log release version
         if: ${{ github.event_name == 'release' }}
         id: version_tag
         run: |
