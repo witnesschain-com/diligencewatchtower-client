@@ -30,7 +30,16 @@ jobs:
             path: ./RELEASE.md
 
   build-watchtower:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            label: linux-amd64
+          - os: macos-latest
+            label: darwin-arm64
+
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
 
@@ -41,7 +50,7 @@ jobs:
     
       - name: Build
         working-directory: ${{ env.WATCHTOWER_DIR }}
-        run: go build .
+        run: go build -o watchtower_${{matrix.label}} -ldflags "-X main.VERSION=${{ github.event.inputs.tag }}" .
     
       - name: List Output
         run: ls -ltr ${{ env.WATCHTOWER_DIR }}
@@ -50,11 +59,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: watchtower_bin
-          path: ${{ env.WATCHTOWER_DIR }}/watchtower
+          path: ${{ env.WATCHTOWER_DIR }}/watchtower_${{ matrix.label }}
           retention-days: 1
-
-
-
 
   create-public-release:
     needs: 
@@ -76,7 +82,8 @@ jobs:
           prerelease: ${{ github.event.inputs.release_type }}
           body_path: ./release_notes/RELEASE.md
           files: |
-            ./watchtower_bin/watchtower
+            ./watchtower_bin/watchtower_linux-armd64
+            ./watchtower_bin/watchtower_darwin-arm64
       
       -
         name: Test log release version
@@ -97,4 +104,5 @@ jobs:
           prerelease: ${{ github.event.release.prerelease}}
           body_path: ./release_notes/RELEASE.md
           files: |
-            ./watchtower_bin/watchtower
+            ./watchtower_bin/watchtower_linux-armd64
+            ./watchtower_bin/watchtower_darwin-arm64
