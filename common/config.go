@@ -27,8 +27,7 @@ type WatchTowerConfig struct {
 	// L1 - ethereum RPC urls
 	PrivateKey                  string `json:"private_key"`
 	Vault                       string `json:"encrypted_vault_directory"`
-	GocryptfsDirectoryPath      string `json:"gocryptfs_directory_path"`
-	GocryptfsKeyName            string `json:"gocryptfs_key_name"`
+	GocryptfsKey                string `json:"gocryptfs_key"`
 	EthWebsocketURL             string `json:"eth_websocket_url"`
 	EthTestnetWebsocketURL      string `json:"eth_testnet_websocket_url"`
 	ProofSubmissionWebsocketURL string `json:"proof_submission_chain_url"`
@@ -187,8 +186,8 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 		Error("Config validation failed! please fix above issues")
 	}
 
-	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.Vault == "" && config.GocryptfsKeyName == "" {
-		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, gocryptfs_key_name or private_key")
+	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.Vault == "" && config.GocryptfsKey == "" {
+		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, gocryptfs_key or private_key")
 		isValid = false
 	}
 
@@ -342,14 +341,11 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 			key = config.PrivateKey[2:]
 		}
 		SetPrivateKey(key)
-	} else if len(config.GocryptfsKeyName) > 0 {
-		if len(config.GocryptfsDirectoryPath) > 0 {
-			opCommon.SetKeysPath(config.GocryptfsDirectoryPath)
-		}
+	} else if len(config.GocryptfsKey) > 0 {
+		opCommon.ProcessConfigKeyPath(config.GocryptfsKey)
 		opCommon.UseEncryptedKeys()
 		defer opCommon.Unmount()
-
-		key := opCommon.GetPrivateKeyFromFile(config.GocryptfsKeyName)
+		key := opCommon.GetPrivateKey(config.GocryptfsKey)
 		if key[0:2] == "0x" {
 			key = key[2:]
 		}

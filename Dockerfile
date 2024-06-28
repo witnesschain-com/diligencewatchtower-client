@@ -1,18 +1,20 @@
 # syntax=docker/dockerfile:1
   
-FROM golang:1.20 as stage-build
+FROM golang:1.22.1 as stage-build
 
 ARG WATCHTOWER_VERSION
-WORKDIR /watchtower/src/client/
+WORKDIR /watchtower
 
-COPY . ./
+COPY . .
+RUN ls
 RUN go mod download
 
+WORKDIR /watchtower/cmd/watchtower
+RUN go build -o watchtower -ldflags="-X 'main.VERSION=${WATCHTOWER_VERSION}'" . 
+RUN echo "Completed build1"
 
-RUN go build -o watchtower .
-RUN chmod +x ./rundocker.sh
 
-FROM debian:stable 
+FROM debian:stable
 WORKDIR /watchtower/src/client
 
 RUN mkdir certs
@@ -24,5 +26,6 @@ COPY rundocker.sh .
 COPY LICENSE /
 RUN apt update && apt install certbot curl -y
 RUN chmod +x ./rundocker.sh
-COPY --from=stage-build /watchtower/src/client/watchtower .
+COPY --from=stage-build /watchtower/cmd/watchtower/watchtower .
+RUN echo "Completed build2"
 CMD ["./rundocker.sh"]

@@ -1,9 +1,6 @@
 name: Dev Release
 
-on:
-  push:
-    branches: #initial trigger
-        - 'chores/watchtower_patch' 
+on: 
   workflow_dispatch: 
     inputs:
       watchtower_version:
@@ -37,7 +34,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./src/client/
+          context: .
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: WATCHTOWER_VERISON=${{inputs.watchtower_version}}
