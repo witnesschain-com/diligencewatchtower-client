@@ -10,7 +10,6 @@
 
                 "// WARNING 1"                  : "This PRIVATE key is for the identity of watchtower, and NOT operator's private key",
                 "// WARNING 2"                  : "NEVER expose your operator's private key anywhere",
-        "watchtower_address"                    : "",
 
         "host_name"                             : "",
 
@@ -29,7 +28,7 @@
          "currently_watching_l1"                : "eth",
          "proof_submission_chain_url"           : "https://rpc.witnesschain.com",
          "proof_submission_chain_id"            : 1702448187,
-         "currently_watching_l2"                : "base", "// TODO" : "set the chain to watch, choose between 'optimsm', 'base'",
+         "currently_watching_l2"                : "base", "// TODO" : "set the chain to watch, choose between 'optimism', 'base'",
          "witnesschain_coordinator_url"         : "https://api.witnesschain.com/",
 
          "l2"                                   : {
