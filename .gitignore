@@ -4,3 +4,4 @@ cmd/watchtower/watchtower
 cmd/pod/pod
 cmd/poi/poi
 cmd/coordinator/coordinator
+*.swp

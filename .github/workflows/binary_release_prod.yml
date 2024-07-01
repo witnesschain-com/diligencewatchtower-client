@@ -15,8 +15,8 @@ on:
         default: false
 
 env:
-  WATCHTOWER_DIR: ./src/client
-  REWARDBOUNTY_DIR: ./src/smart_contracts/script/rewardBounty
+  WATCHTOWER_DIR: ./cmd/watchtower
+
 jobs:
   upload-releasenotes:
     runs-on: ubuntu-latest
@@ -30,18 +30,27 @@ jobs:
             path: ./RELEASE.md
 
   build-watchtower:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            label: linux-amd64
+          - os: macos-latest
+            label: darwin-arm64
+
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.22.1'
     
       - name: Build
         working-directory: ${{ env.WATCHTOWER_DIR }}
-        run: go build .
+        run: go build -o watchtower_${{matrix.label}} -ldflags "-X main.VERSION=${{ github.event.inputs.tag }}" .
     
       - name: List Output
         run: ls -ltr ${{ env.WATCHTOWER_DIR }}
@@ -50,43 +59,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: watchtower_bin
-          path: ${{ env.WATCHTOWER_DIR }}/watchtower
+          path: ${{ env.WATCHTOWER_DIR }}/watchtower_${{ matrix.label }}
           retention-days: 1
-
-
-  build-rewardBounty:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21.5'
-    
-      - name: Build
-        working-directory: ${{ env.REWARDBOUNTY_DIR }}
-        run: go build .
-    
-      - name: List Output
-        run: ls -ltr ${{ env.REWARDBOUNTY_DIR }}
-    
-      - name: Tarball binary & helper script
-        working-directory: ${{ env.REWARDBOUNTY_DIR }}
-        run: tar czvf rewardBounty.tar.gz callRewardBounty reward_bounty.sh
-    
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v3
-        with:
-          name: rewardBounty_bin
-          path: ${{ env.REWARDBOUNTY_DIR }}/rewardBounty.tar.gz
-          retention-days: 1
-
 
   create-public-release:
     needs: 
       - build-watchtower
-      - build-rewardBounty
     runs-on: ubuntu-latest
     steps:
     
@@ -94,21 +72,21 @@ jobs:
         uses: actions/download-artifact@v3
 
 
+
       - name: GH Release | Manual 
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: softprops/action-gh-release@v0.1.15
         with:
-          repository: kaleidoscope-blockchain/watchtower
-          token: ${{ secrets.WATCHTOWER_REPO_ACCESS_TOKEN }}
+          repository: witnesschain-com/diligencewatchtower-client
+          token: ${{ github.token }}
           tag_name: ${{ github.event.inputs.tag }}
           prerelease: ${{ github.event.inputs.release_type }}
           body_path: ./release_notes/RELEASE.md
           files: |
-            ./watchtower_bin/watchtower
-            ./rewardBounty_bin/rewardBounty.tar.gz
+            ./watchtower_bin/watchtower_linux-amd64
+            ./watchtower_bin/watchtower_darwin-arm64
       
-      -
-        name: Test log release version
+      - name: Test log release version
         if: ${{ github.event_name == 'release' }}
         id: version_tag
         run: |
@@ -120,11 +98,11 @@ jobs:
         if: ${{ github.event_name == 'release' }}
         uses: softprops/action-gh-release@v0.1.15
         with:
-          repository: kaleidoscope-blockchain/watchtower
-          token: ${{ secrets.WATCHTOWER_REPO_ACCESS_TOKEN }}
+          repository: witnesschain-com/diligencewatchtower-client
+          token: ${{ github.token }}
           tag_name: ${{ steps.version_tag.outputs.release_tag }}
           prerelease: ${{ github.event.release.prerelease}}
-          body_path: ./release_notes/RELEASE.md
+          body_path: ./RELEASE.md
           files: |
-            ./watchtower_bin/watchtower
-            ./rewardBounty_bin/rewardBounty.tar.gz
+            ./watchtower_bin/watchtower_linux-amd64
+            ./watchtower_bin/watchtower_darwin-arm64
