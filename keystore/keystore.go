@@ -42,9 +42,6 @@ func SetupVault(watchtowerAddress common.Address, chainID *big.Int, privateKey *
 		watchtowerAccount.URL = watchtoweUrl
 
 		backend, err := web3signer.NewExternalBackend(endpoint)
-		if err != nil{
-			return nil, err
-		}
 
 		if err != nil {
 			wtCommon.Info(err)
@@ -65,9 +62,9 @@ func SetupVault(watchtowerAddress common.Address, chainID *big.Int, privateKey *
 				watchtoweUrl.UnmarshalJSON([]byte(endpoint))
 				watchtowerAccount = accounts.Account{Address: watchtowerAddress, URL: watchtoweUrl}
 			}
+			wtCommon.Info("keystore: web3signer: " + watchtowerAccount.URL.String())
+			return &Vault{name: "web3signer", account: watchtowerAccount, backend: backend}, nil
 		}
-		wtCommon.Info("keystore: web3signer: " + watchtowerAccount.URL.String())
-		return &Vault{name: "web3signer", account: watchtowerAccount, backend: backend}, nil
 	}
 
 	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted file system")
