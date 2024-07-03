@@ -1,3 +1,4 @@
+# docker run --rm -p 9000:9000 --volume $PWD:/root consensys/web3signer:develop --key-store-path=/root eth1 --chain-id=1237146866
 type: "file-raw"
 keyType: "SECP256K1"
 privateKey: "0x25b1166a43c109cb330af8945d364722757c65ed2bfed5444b5a2f057f82d391"

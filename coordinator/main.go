@@ -3,6 +3,7 @@ package coordinator
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"strconv"
 	"sync"
 	"time"
@@ -92,7 +93,7 @@ func StartCoordinator(simpleConfig wtCommon.SimplifiedConfig) {
 	)
 	go cache.Start()
 
-	Vault, err := keystore.SetupVault(&simpleConfig)
+	Vault, err := keystore.SetupVault(simpleConfig.WatchtowerAddress, big.NewInt(simpleConfig.ProofSubmissionChainID), simpleConfig.PrivateKey, simpleConfig.ExternalSignerEndpoint)
 	if err != nil {
 		wtCommon.Error(err)
 	}
@@ -117,7 +118,7 @@ func StartCoordinator(simpleConfig wtCommon.SimplifiedConfig) {
 func HandleMessages(ws *core.WebsocketClient, channel chan string, deps datatypes.TracerDependencies, config *wtCommon.SimplifiedConfig, client auth.CoordinatorClient) {
 	var lastTxn string
 	var lastChainID string
-	signer, err := keystore.SetupVault(config)
+	signer, err := keystore.SetupVault(config.WatchtowerAddress, big.NewInt(config.ProofSubmissionChainID), config.PrivateKey, config.ExternalSignerEndpoint)
 	if err != nil {
 		wtCommon.Error(err)
 	}
