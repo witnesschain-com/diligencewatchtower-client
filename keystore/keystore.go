@@ -35,6 +35,9 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 
 	if config.ExternalSignerEndpoint != "" {
 		backend, err := web3signer.NewExternalBackend(config.ExternalSignerEndpoint)
+		if err != nil{
+			return nil, err
+		}
 		fmt.Print(backend, err)
 		if err != nil {
 			wtCommon.Info(err)
@@ -70,7 +73,12 @@ func (vault *Vault) NewTransactOpts(chainID *big.Int) *bind.TransactOpts {
 		return &vault.transactOpts
 	}
 	if vault.name == "web3signer" {
-		return NewWeb3SignerTransactionOpts(vault, nil)
+		wallets := vault.backend.Wallets()
+		for _, wallet := range wallets{
+			if wallet.Contains(vault.account){
+				return NewWeb3SignerTransactionOpts(wallet, vault.account, chainID)
+			}
+		}
 	}
 	panic("NewTransactOpts()")
 	return nil
