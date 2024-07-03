@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"math/big"
 	"net/http"
+	"os"
 	"sync"
 	"time"
-	"log"
-	"os"
 
+	"github.com/urfave/cli/v2"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 	"github.com/witnesschain-com/diligencewatchtower-client/watcher"
 	"github.com/witnesschain-com/diligencewatchtower-client/webserver"
-	"github.com/urfave/cli/v2"
 
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	coordinator "github.com/witnesschain-com/diligencewatchtower-client/coordinator"
@@ -94,7 +95,8 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 		wtCommon.Fatal("Pre-startup checks failed!")
 	}
 
-	vault, err := keystore.SetupVault(simplifiedConfig)
+	config := simplifiedConfig
+	vault, err := keystore.SetupVault(config.WatchtowerAddress, big.NewInt(config.ProofSubmissionChainID), config.PrivateKey, config.ExternalSignerEndpoint)
 	if err != nil {
 		wtCommon.Error(err)
 	}

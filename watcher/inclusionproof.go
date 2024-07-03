@@ -16,8 +16,8 @@ import (
 	"github.com/witnesschain-com/diligencewatchtower-client/bindings"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/contractutils"
-	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
+	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
 )
 
 // starts the txn inclusion watcher component of the watchtower
@@ -42,7 +42,7 @@ func StartInclusionWatcher(
 	defer SubmissionChainClient.Close()
 
 
-	vault, err := keystore.SetupVault(config)
+	vault, err := keystore.SetupVault(config.WatchtowerAddress, big.NewInt(config.ProofSubmissionChainID), config.PrivateKey, config.ExternalSignerEndpoint)
 
 	if err != nil {
 		wtCommon.Error(err)

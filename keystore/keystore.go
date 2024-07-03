@@ -1,8 +1,9 @@
 package keystore
 
 import (
+	"crypto/ecdsa"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -21,28 +22,34 @@ type Vault struct {
 	transactOpts bind.TransactOpts
 }
 
-func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
+func SetupVault(watchtowerAddress common.Address, chainID *big.Int, privateKey *ecdsa.PrivateKey, endpoint string) (*Vault, error) {
+	watchtoweUrl := accounts.URL{}
+	
 
-	account := accounts.Account{Address: config.WatchtowerAddress}
+	watchtowerAccount := accounts.Account{Address: watchtowerAddress, URL: watchtoweUrl}
 
-	if config.PrivateKey != nil {
-		backend := newRawBackend(config.PrivateKey)
-		chainID := new(big.Int).SetUint64(uint64(config.ProofSubmissionChainID))
-		transactOpts := NewRawTransactionOpts(config.PrivateKey, chainID)
-		wtCommon.Info("keystore: loaded raw vault")
-		return &Vault{name: "raw", account: account, backend: backend, transactOpts: *transactOpts}, nil
+	if privateKey != nil {
+		backend := newRawBackend(privateKey)
+		transactOpts := NewRawTransactionOpts(privateKey, chainID)
+		watchtowerAccount.URL = accounts.URL{Scheme: "raw", Path: watchtowerAddress.Hex()}
+		wtCommon.Info("keystore: " + watchtowerAccount.URL.String())
+		return &Vault{name: "raw", account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
 	}
 
-	if config.ExternalSignerEndpoint != "" {
-		backend, err := web3signer.NewExternalBackend(config.ExternalSignerEndpoint)
+	if endpoint != "" {
+		endpointBytes, _ := json.Marshal(endpoint)
+		watchtoweUrl.UnmarshalJSON(endpointBytes)
+		watchtowerAccount.URL = watchtoweUrl
+
+		backend, err := web3signer.NewExternalBackend(endpoint)
 		if err != nil{
 			return nil, err
 		}
-		fmt.Print(backend, err)
+
 		if err != nil {
 			wtCommon.Info(err)
 		} else {
-			if config.WatchtowerAddress.Cmp(common.HexToAddress("0")) == 0 {
+			if watchtowerAddress.Cmp(common.HexToAddress("0")) == 0 {
 				if len(backend.Wallets()) == 0 {
 					return nil, errors.New("web3signer: no wallet found")
 				}
@@ -51,20 +58,19 @@ func SetupVault(config *wtCommon.SimplifiedConfig) (*Vault, error) {
 					return nil, errors.New("web3signer: no keys found")
 				}
 
-				config.WatchtowerAddress = backend.Wallets()[0].Accounts()[0].Address
-				account = accounts.Account{Address: config.WatchtowerAddress}
+				watchtowerAddress = backend.Wallets()[0].Accounts()[0].Address
+				
+				
+				watchtoweUrl := accounts.URL{}
+				watchtoweUrl.UnmarshalJSON([]byte(endpoint))
+				watchtowerAccount = accounts.Account{Address: watchtowerAddress, URL: watchtoweUrl}
 			}
-			wtCommon.Info("keystore: loaded web3signer vault")
-			return &Vault{name: "web3signer", account: account, backend: backend}, nil
 		}
+		wtCommon.Info("keystore: web3signer: " + watchtowerAccount.URL.String())
+		return &Vault{name: "web3signer", account: watchtowerAccount, backend: backend}, nil
 	}
 
-	if config.Vault != "" {
-		wtCommon.Info("setup encrypted vault")
-	}
-
-	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted fs")
-
+	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted file system")
 	return nil, nil
 }
 
