@@ -58,11 +58,10 @@ func SetupVault(watchtowerAddress common.Address, chainID *big.Int, privateKey *
 				watchtowerAddress = backend.Wallets()[0].Accounts()[0].Address
 				
 				
-				watchtoweUrl := accounts.URL{}
-				watchtoweUrl.UnmarshalJSON([]byte(endpoint))
-				watchtowerAccount = accounts.Account{Address: watchtowerAddress, URL: watchtoweUrl}
+				watchtowerAccount = accounts.Account{Address: watchtowerAddress}
 			}
 			wtCommon.Info("keystore: web3signer: " + watchtowerAccount.URL.String())
+			watchtowerAccount.URL = accounts.URL{Scheme: "extapi", Path: endpoint}
 			return &Vault{name: "web3signer", account: watchtowerAccount, backend: backend}, nil
 		}
 	}
