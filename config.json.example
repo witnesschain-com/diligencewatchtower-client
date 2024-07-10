@@ -27,7 +27,7 @@
              "// EXAMPLE"                    : "wss://my-L1-node -OR- ws://my-L1-node",
       
       "currently_watching_l1"                : "eth_testnet",
-      "eth_testnet_chain_id"                 : 11155111,
+      "eth_testnet_chain_id"                 : 17000,
       "proof_submission_chain_url"           : "https://blue-orangutan-rpc.eu-north-2.gateway.fm/",
       "proof_submission_chain_id"            : 1237146866,
       "currently_watching_l2"                : "base", "// TODO" : "set the chain to watch, choose between 'optimsm', 'base'",
