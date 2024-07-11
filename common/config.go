@@ -18,7 +18,6 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	opCommon "github.com/witnesschain-com/operator-cli/common"
 )
 
 // WatchTowerConfig is used to store all the configurable parameters
@@ -186,8 +185,8 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 		Error("Config validation failed! please fix above issues")
 	}
 
-	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.Vault == "" && config.GocryptfsKey == "" {
-		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_vault_directory, gocryptfs_key or private_key")
+	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.GocryptfsKey == "" {
+		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, gocryptfs_key or private_key")
 		isValid = false
 	}
 
@@ -325,7 +324,11 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	simpleConfig.ExternalSignerEndpoint = config.ExternalSignerEndpoint
 	simpleConfig.Vault = config.Vault
 
-	SetPrivateKey := func(key string) {
+	if len(config.PrivateKey) > 0 {
+		key := config.PrivateKey
+		if config.PrivateKey[0:2] == "0x" {
+			key = config.PrivateKey[2:]
+		}
 		private_key, err := crypto.HexToECDSA(key)
 		if err != nil {
 			Fatal(err)
@@ -333,23 +336,6 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		simpleConfig.PrivateKey = private_key
 		config.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey).Hex()
 		simpleConfig.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey)
-	}
-
-	if len(config.PrivateKey) > 0 {
-		key := config.PrivateKey
-		if config.PrivateKey[0:2] == "0x" {
-			key = config.PrivateKey[2:]
-		}
-		SetPrivateKey(key)
-	} else if len(config.GocryptfsKey) > 0 {
-		opCommon.ProcessConfigKeyPath(config.GocryptfsKey)
-		opCommon.UseEncryptedKeys()
-		defer opCommon.Unmount()
-		key := opCommon.GetPrivateKey(config.GocryptfsKey)
-		if key[0:2] == "0x" {
-			key = key[2:]
-		}
-		SetPrivateKey(key)
 	}
 
 	if len(config.WatchtowerAddress) != 0 {

@@ -10,9 +10,11 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/witnesschain-com/diligencewatchtower-client/third_party/web3signer"
 
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+	opCommon "github.com/witnesschain-com/operator-cli/common"
 )
 
 type Vault struct {
@@ -22,9 +24,17 @@ type Vault struct {
 	transactOpts bind.TransactOpts
 }
 
+type VaultConfig struct {
+	ChainID *big.Int
+	WatchtowerAddress common.Address
+	PrivateKey *ecdsa.PrivateKey
+	Endpoint string
+	GocryptfsKey string
+}
+
 func SetupVault(watchtowerAddress common.Address, chainID *big.Int, privateKey *ecdsa.PrivateKey, endpoint string) (*Vault, error) {
+	gocryptfsKey := "/home/kripashanker/.witnesschain.com/.encrypted_keys/wt1"
 	watchtoweUrl := accounts.URL{}
-	
 
 	watchtowerAccount := accounts.Account{Address: watchtowerAddress, URL: watchtoweUrl}
 
@@ -66,6 +76,18 @@ func SetupVault(watchtowerAddress common.Address, chainID *big.Int, privateKey *
 		}
 	}
 
+	if len(gocryptfsKey) != 0 {
+		privateKey, err := opCommon.LoadPrivateKey(gocryptfsKey)
+		if err != nil {
+			return nil, err
+		}
+		watchtowerAccount.Address = crypto.PubkeyToAddress(privateKey.PublicKey)
+		watchtowerAccount.URL = accounts.URL{Scheme: "gocryptfs", Path: gocryptfsKey}
+		backend := newRawBackend(privateKey)
+		wtCommon.Info("keystore: gocryptfs: " + gocryptfsKey)
+		return &Vault{name: "gocryptfs", account: watchtowerAccount, backend: backend}, nil
+	}
+
 	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted file system")
 	return nil, nil
 }
@@ -89,16 +111,20 @@ func (vault *Vault) NewTransactOpts(chainID *big.Int) *bind.TransactOpts {
 func (vault *Vault) SignData(data []byte) ([]byte, error) {
 	wallets := vault.backend.Wallets()
 
+	// there can be more than one wallet, say two usb hardware wallet plugged into a system
 	for _, wallet := range wallets {
-		signedData, err := wallet.SignData(vault.account, "plain/text", data)
-		if err != nil {
-			wtCommon.Error(err)
-			return nil, err
+		if wallet.Contains(vault.account) {
+			signedData, err := wallet.SignData(vault.account, "plain/text", data)
+			if err != nil {
+				wtCommon.Error(err)
+				return nil, err
+			}
+			return signedData, nil
 		}
-		return signedData, nil
 	}
 
-	wtCommon.Fatal("SignData failed, watchtower account not found in the keystore")
+	wtCommon.Fatal("SignData failed, watchtower account not found in any wallet.")
+
 	return nil, nil
 }
 

@@ -107,7 +107,6 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 
 	wtCommon.Info("Starting Watchtower (" + VERSION + ") ...")
 
-	// setup EL monitoring and nodeAPI
 
 	go func() {
 		for {
@@ -134,7 +133,7 @@ func Run(configData *wtCommon.WatchTowerConfig, simplifiedConfig *wtCommon.Simpl
 	var waitGroup sync.WaitGroup
 
 	// waitgroup waits for 1 process
-	waitGroup.Add(1)
+	waitGroup.Add(2)
 
 	var server *http.Server
 

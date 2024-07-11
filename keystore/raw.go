@@ -108,7 +108,6 @@ func (api *raw) Close() error{
 }
 
 func (api *raw) Contains(account accounts.Account) bool {
-	wtCommon.Fatal(notImplemented)
 	if api.address == account.Address{
 		return true
 	}
