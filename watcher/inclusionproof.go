@@ -42,7 +42,8 @@ func StartInclusionWatcher(
 	defer SubmissionChainClient.Close()
 
 
-	vault, err := keystore.SetupVault(config.WatchtowerAddress, big.NewInt(config.ProofSubmissionChainID), config.PrivateKey, config.ExternalSignerEndpoint)
+	vc := keystore.GetVaultConfig(config) 
+	vault, err := keystore.SetupVault(vc)
 
 	if err != nil {
 		wtCommon.Error(err)

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/big"
 	"net/http"
 	"os"
 	"sync"
@@ -95,8 +94,8 @@ _[_]_[_]_[_]_[__│__│__│__│_]_[_]_[_]_[_]_
 		wtCommon.Fatal("Pre-startup checks failed!")
 	}
 
-	config := simplifiedConfig
-	vault, err := keystore.SetupVault(config.WatchtowerAddress, big.NewInt(config.ProofSubmissionChainID), config.PrivateKey, config.ExternalSignerEndpoint)
+	vc := keystore.GetVaultConfig(simplifiedConfig)
+	vault, err := keystore.SetupVault(vc)
 	if err != nil {
 		wtCommon.Error(err)
 	}

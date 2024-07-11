@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"math/big"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -53,8 +52,8 @@ func (cc *CoordinatorClient) Initialize(coordinatorUrl string, watchtowerAddress
 
 	cc.config.WatchtowerAddress = watchtowerAddress
 
-	chianID := big.NewInt(config.ProofSubmissionChainID)
-	cc.config.Vault, err = keystore.SetupVault(config.WatchtowerAddress, chianID, config.PrivateKey, config.ExternalSignerEndpoint)
+	vc := keystore.GetVaultConfig(config)
+	cc.config.Vault, err = keystore.SetupVault(vc)
 	if err != nil {
 		wtCommon.Error(err)
 		return err

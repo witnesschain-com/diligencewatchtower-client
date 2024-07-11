@@ -11,7 +11,6 @@
 package watcher
 
 import (
-	"math/big"
 	"strconv"
 	"sync"
 
@@ -154,7 +153,8 @@ func StartDiligenceWatcher(
 		wtCommon.Fatal(err)
 	}
 
-	vault, err := keystore.SetupVault(simplifiedConfig.WatchtowerAddress, big.NewInt(simplifiedConfig.ProofSubmissionChainID), simplifiedConfig.PrivateKey, simplifiedConfig.ExternalSignerEndpoint)
+	vc := keystore.GetVaultConfig(simplifiedConfig)	
+	vault, err := keystore.SetupVault(vc)
 
 	if err != nil {
 		wtCommon.Error(err)

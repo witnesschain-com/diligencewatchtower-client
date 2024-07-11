@@ -246,7 +246,7 @@ type SimplifiedConfig struct {
 	GasPrice                     int64
 	WatchtowerAddress            ethCommon.Address
 	ExternalSignerEndpoint       string
-	Vault                        string
+	GocryptfsKey                 string
 	PrivateKey                   *ecdsa.PrivateKey
 }
 
@@ -322,7 +322,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	simpleConfig.ProofSubmissionWebsocketURL = config.ProofSubmissionWebsocketURL
 	simpleConfig.ProofSubmissionChainID = int64(config.ProofSubmissionChainID)
 	simpleConfig.ExternalSignerEndpoint = config.ExternalSignerEndpoint
-	simpleConfig.Vault = config.Vault
+	simpleConfig.GocryptfsKey = config.GocryptfsKey
 
 	if len(config.PrivateKey) > 0 {
 		key := config.PrivateKey
@@ -417,3 +417,5 @@ func LoadWebServerConfig(config *WatchTowerConfig) *WebServerConfig {
 	return &webServerConfig
 
 }
+
+
