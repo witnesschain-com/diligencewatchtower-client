@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 	"github.com/witnesschain-com/diligencewatchtower-client/opchain"
@@ -58,7 +59,7 @@ func SignProofOfDiligence(
 
 	hash := crypto.Keccak256Hash(proofOfDilegence)
 
-	signatureOfProofOfDiligence, err := vault.SignData(hash.Bytes())
+	signatureOfProofOfDiligence, err := vault.SignData(hash.Bytes(), apitypes.TextPlain.Mime)
 	if err != nil {
 		wtCommon.Error(err)
 	}

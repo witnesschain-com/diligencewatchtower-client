@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 
 	"github.com/jellydator/ttlcache/v3"
 
@@ -252,7 +253,7 @@ func SignProofOfInclusion(
 	wtCommon.Info("Signing Proof of Inclusion")
 
 
-	signature, err := vault.SignData(hash.Bytes())
+	signature, err := vault.SignData(hash.Bytes(), apitypes.TextPlain.Mime)
 	if err != nil {
 		wtCommon.Error(err)
 	}

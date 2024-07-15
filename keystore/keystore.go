@@ -37,13 +37,6 @@ func SetupVault(vc *VaultConfig) (*Vault, error) {
 
 	watchtowerAccount := accounts.Account{Address: vc.Address, URL: watchtoweUrl}
 
-	if vc.PrivateKey != nil {
-		backend := newRawBackend(vc.PrivateKey)
-		transactOpts := NewRawTransactionOpts(vc.PrivateKey, vc.ChainID)
-		watchtowerAccount.URL = accounts.URL{Scheme: "raw", Path: vc.Address.Hex()}
-		wtCommon.Info("keystore: " + watchtowerAccount.URL.String())
-		return &Vault{name: "raw", Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
-	}
 
 	if vc.Endpoint != "" {
 		endpointBytes, _ := json.Marshal(vc.Endpoint)
@@ -88,6 +81,14 @@ func SetupVault(vc *VaultConfig) (*Vault, error) {
 		return &Vault{name: "gocryptfs", Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
 	}
 
+	if vc.PrivateKey != nil {
+		backend := newRawBackend(vc.PrivateKey)
+		transactOpts := NewRawTransactionOpts(vc.PrivateKey, vc.ChainID)
+		watchtowerAccount.URL = accounts.URL{Scheme: "raw", Path: vc.Address.Hex()}
+		wtCommon.Info("keystore: " + watchtowerAccount.URL.String())
+		return &Vault{name: "raw", Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
+	}
+
 	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted file system")
 	return nil, nil
 }
@@ -108,13 +109,13 @@ func (vault *Vault) NewTransactOpts(chainID *big.Int) *bind.TransactOpts {
 	return nil
 }
 
-func (vault *Vault) SignData(data []byte) ([]byte, error) {
+func (vault *Vault) SignData(data []byte, mimeType string) ([]byte, error) {
 	wallets := vault.backend.Wallets()
 
 	// there can be more than one wallet, say two usb hardware wallet plugged into a system
 	for _, wallet := range wallets {
 		if wallet.Contains(vault.Account) {
-			signedData, err := wallet.SignData(vault.Account, "plain/text", data)
+			signedData, err := wallet.SignData(vault.Account, mimeType, data)
 			if err != nil {
 				wtCommon.Error(err)
 				return nil, err
@@ -133,11 +134,13 @@ func (vault *Vault) SignTx(account accounts.Account, tx *types.Transaction, chai
 	wallets := vault.backend.Wallets()
 
 	for _, wallet := range wallets {
-		signedTx, err := wallet.SignTx(vault.Account, tx, chainID)
-		if err != nil {
-			return nil, err
+		if wallet.Contains(vault.Account) {
+			signedTx, err := wallet.SignTx(vault.Account, tx, chainID)
+			if err != nil {
+				return nil, err
+			}
+			return signedTx, nil
 		}
-		return signedTx, nil
 	}
 
 	wtCommon.Fatal("SignData failed, watchtower account not found in the keystore")

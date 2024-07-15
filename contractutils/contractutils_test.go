@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
 )
@@ -15,10 +16,11 @@ import (
 
 func TestSubmitProofToDiligenceProofManager(t *testing.T){
 
-	config := wtCommon.LoadConfigFromJson()
+	config := wtCommon.LoadConfigFromJson("config.json")
 	simplifiedConfig := wtCommon.LoadSimplifiedConfig(config, nil)
 
-	vault, err := keystore.SetupVault(simplifiedConfig)
+	vc := keystore.GetVaultConfig(simplifiedConfig)
+	vault, err := keystore.SetupVault(vc)
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +44,7 @@ func TestSubmitProofToDiligenceProofManager(t *testing.T){
 
 	proofOfDilegence := []byte{0x1}
 	hash := crypto.Keccak256Hash(proofOfDilegence)
-	signedProofOfDiligence, err := vault.SignData(hash.Bytes())
+	signedProofOfDiligence, err := vault.SignData(hash.Bytes(), apitypes.TextPlain.Mime)
 	if err != nil{
 		panic(err)
 	}
@@ -67,10 +69,11 @@ func TestSubmitProofToDiligenceProofManager(t *testing.T){
 }
 
 func TestSubmitProofToInclusionProofManager(t *testing.T){
-	config := wtCommon.LoadConfigFromJson()
+	config := wtCommon.LoadConfigFromJson("config.json")
 	simplifiedConfig := wtCommon.LoadSimplifiedConfig(config, nil)
 
-	vault, err := keystore.SetupVault(simplifiedConfig)
+	vc := keystore.GetVaultConfig(simplifiedConfig)
+	vault, err := keystore.SetupVault(vc)
 	if err != nil {
 		panic(err)
 	}
@@ -97,7 +100,7 @@ func TestSubmitProofToInclusionProofManager(t *testing.T){
 
 	proofOfDilegence := []byte{0x1}
 	hash := crypto.Keccak256Hash(proofOfDilegence)
-	signedProofOfDiligence, err := vault.SignData(hash.Bytes())
+	signedProofOfDiligence, err := vault.SignData(hash.Bytes(), apitypes.TextPlain.Mime)
 	if err != nil{
 		panic(err)
 	}

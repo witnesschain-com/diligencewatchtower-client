@@ -13,7 +13,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
+
 )
 
 var notImplemented = errors.New("Not implemented. Operation not supported.")
@@ -59,14 +61,29 @@ func NewRawTransactionOpts(privateKey *ecdsa.PrivateKey, chainID  *big.Int) *bin
 
 
 func (api *raw) SignData (account accounts.Account, mimeType string, data []byte) ([]byte, error){
-	ethereumMessage := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
-	hash := crypto.Keccak256Hash([]byte(ethereumMessage))
-	signature, err := crypto.Sign(hash.Bytes(), api.key)
-	if err != nil {
-		return nil, err
+	switch mimeType {
+		case apitypes.DataTyped.Mime:
+			signature, err := crypto.Sign(data, api.key)
+			if err != nil {
+				return nil, err
+			}
+			signature[64] += 27
+			return signature, nil
+
+		case apitypes.TextPlain.Mime: // TextPlain.Mime
+			// hash = keccak256("\x19Ethereum Signed Message:\n${message length}${message}")
+			ethereumMessage := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
+			hash := crypto.Keccak256Hash([]byte(ethereumMessage))
+			signature, err := crypto.Sign(hash.Bytes(), api.key)
+			if err != nil {
+				return nil, err
+			}
+			signature[64] += 27
+			return signature, nil
+
 	}
-	signature[64] += 27
-	return signature, nil
+
+	return nil, errors.New("raw keystore: unable to sign message: address :" + api.address.Hex())
 }
 
 func (api *raw) SignTx(account accounts.Account, tx *types.Transaction, chainID *big.Int) (*types.Transaction, error) {

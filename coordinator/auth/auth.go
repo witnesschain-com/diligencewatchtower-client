@@ -12,6 +12,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	wtCommon "github.com/witnesschain-com/diligencewatchtower-client/common"
 	coordCfg "github.com/witnesschain-com/diligencewatchtower-client/coordinator/configuration"
 	"github.com/witnesschain-com/diligencewatchtower-client/keystore"
@@ -31,7 +32,7 @@ const (
 var BASEURL string
 
 func SignCoordinatorMessage(message string, watchtowerAddress common.Address, vault *keystore.Vault) (string, error) {
-	signature, err := vault.SignData([]byte(message))
+	signature, err := vault.SignData([]byte(message), apitypes.TextPlain.Mime)
 	if err != nil {
 		wtCommon.Error(err)
 		return "", err
