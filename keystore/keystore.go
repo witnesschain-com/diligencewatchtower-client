@@ -30,6 +30,7 @@ type VaultConfig struct {
 	PrivateKey *ecdsa.PrivateKey
 	Endpoint string
 	GocryptfsKey string
+	W3SecretStorageKey string
 }
 
 func SetupVault(vc *VaultConfig) (*Vault, error) {
