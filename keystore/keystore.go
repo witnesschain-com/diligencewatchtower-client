@@ -25,19 +25,18 @@ type Vault struct {
 }
 
 type VaultConfig struct {
-	ChainID *big.Int
-	Address common.Address
-	PrivateKey *ecdsa.PrivateKey
-	Endpoint string
-	GocryptfsKey string
-	W3SecretStorageKey string
+	ChainID      *big.Int
+	Address      common.Address
+	PrivateKey   *ecdsa.PrivateKey
+	Endpoint     string
+	EncryptedKey string
+	KeyType      string
 }
 
 func SetupVault(vc *VaultConfig) (*Vault, error) {
 	watchtoweUrl := accounts.URL{}
 
 	watchtowerAccount := accounts.Account{Address: vc.Address, URL: watchtoweUrl}
-
 
 	if vc.Endpoint != "" {
 		endpointBytes, _ := json.Marshal(vc.Endpoint)
@@ -59,8 +58,7 @@ func SetupVault(vc *VaultConfig) (*Vault, error) {
 				}
 
 				watchtowerAddress := backend.Wallets()[0].Accounts()[0].Address
-				
-				
+
 				watchtowerAccount = accounts.Account{Address: watchtowerAddress}
 			}
 			wtCommon.Info("keystore: web3signer: " + watchtowerAccount.URL.String())
@@ -69,17 +67,17 @@ func SetupVault(vc *VaultConfig) (*Vault, error) {
 		}
 	}
 
-	if len(vc.GocryptfsKey) != 0 {
-		privateKey, err := opCommon.LoadPrivateKey(vc.GocryptfsKey)
+	if len(vc.EncryptedKey) != 0 {
+		privateKey, err := opCommon.LoadPrivateKey(vc.EncryptedKey, vc.KeyType)
 		if err != nil {
 			return nil, err
 		}
 		watchtowerAccount.Address = crypto.PubkeyToAddress(privateKey.PublicKey)
-		watchtowerAccount.URL = accounts.URL{Scheme: "gocryptfs", Path: vc.GocryptfsKey}
+		watchtowerAccount.URL = accounts.URL{Scheme: vc.KeyType, Path: vc.EncryptedKey}
 		backend := newRawBackend(privateKey)
 		transactOpts := NewRawTransactionOpts(privateKey, vc.ChainID)
-		wtCommon.Info("keystore: gocryptfs: " + vc.GocryptfsKey)
-		return &Vault{name: "gocryptfs", Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
+		wtCommon.Info("keystore : " + vc.KeyType + " : " + vc.EncryptedKey)
+		return &Vault{name: vc.KeyType, Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
 	}
 
 	if vc.PrivateKey != nil {
@@ -100,8 +98,8 @@ func (vault *Vault) NewTransactOpts(chainID *big.Int) *bind.TransactOpts {
 	}
 	if vault.name == "web3signer" {
 		wallets := vault.backend.Wallets()
-		for _, wallet := range wallets{
-			if wallet.Contains(vault.Account){
+		for _, wallet := range wallets {
+			if wallet.Contains(vault.Account) {
 				return NewWeb3SignerTransactionOpts(wallet, vault.Account, chainID)
 			}
 		}
@@ -148,12 +146,13 @@ func (vault *Vault) SignTx(account accounts.Account, tx *types.Transaction, chai
 	return nil, nil
 }
 
-func GetVaultConfig(config *wtCommon.SimplifiedConfig) *VaultConfig{
+func GetVaultConfig(config *wtCommon.SimplifiedConfig) *VaultConfig {
 	return &VaultConfig{
-		Address: config.WatchtowerAddress,
-		PrivateKey: config.PrivateKey,
-		ChainID: big.NewInt(config.ProofSubmissionChainID),
-		Endpoint: config.ExternalSignerEndpoint,
-		GocryptfsKey: config.GocryptfsKey,
+		Address:      config.WatchtowerAddress,
+		PrivateKey:   config.PrivateKey,
+		ChainID:      big.NewInt(config.ProofSubmissionChainID),
+		Endpoint:     config.ExternalSignerEndpoint,
+		EncryptedKey: config.EncryptedKey,
+		KeyType:      config.KeyType,
 	}
 }

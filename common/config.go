@@ -26,7 +26,8 @@ type WatchTowerConfig struct {
 	// L1 - ethereum RPC urls
 	PrivateKey                  string `json:"private_key"`
 	Vault                       string `json:"encrypted_vault_directory"`
-	GocryptfsKey                string `json:"gocryptfs_key"`
+	EncryptedKey                string `json:"encrypted_key"`
+	KeyType                     string `json:"key_type"`
 	EthWebsocketURL             string `json:"eth_websocket_url"`
 	EthTestnetWebsocketURL      string `json:"eth_testnet_websocket_url"`
 	ProofSubmissionWebsocketURL string `json:"proof_submission_chain_url"`
@@ -185,8 +186,8 @@ func ValidateConfig(config *WatchTowerConfig) bool {
 		Error("Config validation failed! please fix above issues")
 	}
 
-	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.GocryptfsKey == "" {
-		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, gocryptfs_key or private_key")
+	if config.ExternalSignerEndpoint == "" && config.PrivateKey == "" && config.EncryptedKey == "" {
+		Error("Incorrect config, please set at least one of the following: external_signer_endpoint, encrypted_key or private_key")
 		isValid = false
 	}
 
@@ -246,8 +247,9 @@ type SimplifiedConfig struct {
 	GasPrice                     int64
 	WatchtowerAddress            ethCommon.Address
 	ExternalSignerEndpoint       string
-	GocryptfsKey                 string
+	EncryptedKey                 string
 	PrivateKey                   *ecdsa.PrivateKey
+	KeyType                      string
 }
 
 // `LoadConfigFromJson` returns a config object of type `WatchTowerConfig` by loading
@@ -322,7 +324,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	simpleConfig.ProofSubmissionWebsocketURL = config.ProofSubmissionWebsocketURL
 	simpleConfig.ProofSubmissionChainID = int64(config.ProofSubmissionChainID)
 	simpleConfig.ExternalSignerEndpoint = config.ExternalSignerEndpoint
-	simpleConfig.GocryptfsKey = config.GocryptfsKey
+	simpleConfig.EncryptedKey = config.EncryptedKey
 
 	if len(config.PrivateKey) > 0 {
 		key := config.PrivateKey
@@ -417,5 +419,3 @@ func LoadWebServerConfig(config *WatchTowerConfig) *WebServerConfig {
 	return &webServerConfig
 
 }
-
-
