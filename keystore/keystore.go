@@ -67,7 +67,18 @@ func SetupVault(vc *VaultConfig) (*Vault, error) {
 		}
 	}
 
-	if len(vc.EncryptedKey) != 0 {
+	if vc.PrivateKey != nil {
+		keyType := "raw"
+		if len(vc.KeyType) != 0 {
+			keyType = vc.KeyType
+		}
+		backend := newRawBackend(vc.PrivateKey)
+		transactOpts := NewRawTransactionOpts(vc.PrivateKey, vc.ChainID)
+		watchtowerAccount.URL = accounts.URL{Scheme: keyType, Path: vc.Address.Hex()}
+		wtCommon.Info("keystore: " + watchtowerAccount.URL.String())
+		return &Vault{name: keyType, Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
+	} else if len(vc.EncryptedKey) != 0 {
+		// corner-case where we could not retrieve encrypted key in config.go initially
 		privateKey, err := opCommon.LoadPrivateKey(vc.EncryptedKey, vc.KeyType)
 		if err != nil {
 			return nil, err
@@ -80,20 +91,12 @@ func SetupVault(vc *VaultConfig) (*Vault, error) {
 		return &Vault{name: vc.KeyType, Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
 	}
 
-	if vc.PrivateKey != nil {
-		backend := newRawBackend(vc.PrivateKey)
-		transactOpts := NewRawTransactionOpts(vc.PrivateKey, vc.ChainID)
-		watchtowerAccount.URL = accounts.URL{Scheme: "raw", Path: vc.Address.Hex()}
-		wtCommon.Info("keystore: " + watchtowerAccount.URL.String())
-		return &Vault{name: "raw", Account: watchtowerAccount, backend: backend, transactOpts: *transactOpts}, nil
-	}
-
 	wtCommon.Fatal("SetupSigner Failed, please configure watchtower private keys in plaintext, web3signer, or encrypted file system")
 	return nil, nil
 }
 
 func (vault *Vault) NewTransactOpts(chainID *big.Int) *bind.TransactOpts {
-	if vault.name == "raw" || vault.name == "gocryptfs" {
+	if vault.name == "raw" || vault.name == "gocryptfs" || vault.name == "w3secretkeys" {
 		return &vault.transactOpts
 	}
 	if vault.name == "web3signer" {

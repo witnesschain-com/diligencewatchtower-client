@@ -18,6 +18,7 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	op_common "github.com/witnesschain-com/operator-cli/common"
 )
 
 // WatchTowerConfig is used to store all the configurable parameters
@@ -27,7 +28,7 @@ type WatchTowerConfig struct {
 	PrivateKey                  string `json:"private_key"`
 	Vault                       string `json:"encrypted_vault_directory"`
 	EncryptedKey                string `json:"encrypted_key"`
-	KeyType                     string `json:"key_type"`
+	KeyType                     string `json:"encrypted_key_type"`
 	EthWebsocketURL             string `json:"eth_websocket_url"`
 	EthTestnetWebsocketURL      string `json:"eth_testnet_websocket_url"`
 	ProofSubmissionWebsocketURL string `json:"proof_submission_chain_url"`
@@ -326,11 +327,7 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	simpleConfig.ExternalSignerEndpoint = config.ExternalSignerEndpoint
 	simpleConfig.EncryptedKey = config.EncryptedKey
 
-	if len(config.PrivateKey) > 0 {
-		key := config.PrivateKey
-		if config.PrivateKey[0:2] == "0x" {
-			key = config.PrivateKey[2:]
-		}
+	SetPrivateKey := func(key string) {
 		private_key, err := crypto.HexToECDSA(key)
 		if err != nil {
 			Fatal(err)
@@ -338,6 +335,33 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 		simpleConfig.PrivateKey = private_key
 		config.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey).Hex()
 		simpleConfig.WatchtowerAddress = crypto.PubkeyToAddress(private_key.PublicKey)
+	}
+
+	if len(config.EncryptedKey) != 0 {
+		if len(config.KeyType) == 0 {
+			Info("Key type not set, using default type as 'w3secretkeys'")
+			simpleConfig.KeyType = "w3secretkeys"
+		} else {
+			simpleConfig.KeyType = config.KeyType
+		}
+
+		op_common.RetryMounting()
+		op_common.ProcessConfigKeyPath(config.EncryptedKey, config.KeyType)
+		op_common.UseEncryptedKeys(config.KeyType)
+		key := op_common.GetPrivateKey(config.EncryptedKey, config.KeyType)
+		if key[0:2] == "0x" {
+			key = key[2:]
+		}
+		SetPrivateKey(key)
+		defer op_common.Unmount()
+	}
+
+	if len(config.PrivateKey) > 0 {
+		key := config.PrivateKey
+		if config.PrivateKey[0:2] == "0x" {
+			key = config.PrivateKey[2:]
+		}
+		SetPrivateKey(key)
 	}
 
 	if len(config.WatchtowerAddress) != 0 {
