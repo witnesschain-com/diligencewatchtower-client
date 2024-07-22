@@ -73,6 +73,7 @@
       "receipt_timeout"                      : 300,
       "watchtower_retries"                   : 5,
       "external_signer_endpoint"             : "http://localhost:9000",
-      "gocryptfs_key"                        : "",    "// TODO" : "set the private key path+name used for the watchtower key in gocryptfs (this is optional)",
-                                                             "" : "if only file name is given, the key will be taken from the default path ~/witnesschain/.encrypted_directory)",
+      "encrypted_key_type"                   : "<type of encrypted keys used. e.g. gocryptfs or w3secretkeys>",
+      "encrypted_key"                        : "",    "// TODO" : "set the private key path+name used for the watchtower key in gocryptfs/w3secretkeys (this is optional)",
+                                                             "" : "if only file name is given, the key will be taken from the default path ~/witnesschain/.gocryptfs/.encrypted_keys or ~/witnesschain/.w3secretkeys)",
 }
