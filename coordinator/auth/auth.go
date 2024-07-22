@@ -85,9 +85,13 @@ func (cc CoordinatorClient) GetHeaders() http.Header {
 	url, _ := url.Parse(BASEURL)
 	cookies := cc.client.Jar.Cookies(url)
 	var header http.Header = http.Header{}
-	if len(cookies) > 1 {
+	if len(cookies) > 0 {
 		header.Add("Content-Type", "application/json")
-		header.Add("Cookie", "__Secure-session="+(*cookies[0]).Value+"; __Secure-session.hash="+(*cookies[1]).Value)
+		var cookieString strings.Builder
+		for _, ck := range cookies {
+			cookieString.WriteString((*ck).Name + "=" + (*ck).Value + ";")
+		}
+		header.Add("Cookie", cookieString.String())
 	}
 	return header
 }
