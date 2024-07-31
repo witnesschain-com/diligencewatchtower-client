@@ -1,13 +1,20 @@
 # Diligence Watchtower Client
 
-Welcome to the official GitHub repository for the Diligence Watchtower Client. Diligence watchtowers are the first line of defense for optimistic rollups. They enable incentive compatible and crypto-economically-secure Proof-of-Diligence (PoD) to make sure watchtowers are working in the happy path for optimistic rollups. 
-The watchtower client is the software that entails a crucial responsibility of monitoring the accuracy of L2 state assertions made by the proposer. This guide offers information on setting up a watchtower node for the WitnessChain Network
+Welcome to the official GitHub repository for the Diligence Watchtower 
+Client. Diligence watchtowers are the first line of defence for 
+optimistic rollups. They enable incentive compatible and 
+crypto-economically-secure Proof-of-Diligence (PoD) to make sure 
+watchtowers are working in the happy path for optimistic rollups.  The 
+watchtower client is the software that entails a crucial responsibility 
+of monitoring the accuracy of L2 (e.g. Optimism, Base) state assertions 
+made by the proposer.  This guide offers information on setting up a 
+watchtower node for the WitnessChain Network
 
 You can read more about the protocol at [`Watchtower Protocol`](https://docs.witnesschain.com/diligence-watchtowers/introduction)
 
 ## Key Features
 
-- **Proof of Diligence**: Proofs-of-Diligence for watching state L2 assertions of OP Stack chains (OP,Base)
+- **Proof of Diligence**: Proofs-of-Diligence for watching state L2 assertions of OP Stack chains (Optimism, Base).
 - **Proof of Inclusion**: Proofs-of-Inclusion for watching Transactions' inclusions in a Block.
 
 ## Getting Started

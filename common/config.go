@@ -338,17 +338,15 @@ func LoadSimplifiedConfig(config *WatchTowerConfig, simpleConfig *SimplifiedConf
 	}
 
 	if len(config.EncryptedKey) != 0 {
-		if len(config.KeyType) == 0 {
-			Info("Key type not set, using default type as 'w3secretkeys'")
-			simpleConfig.KeyType = "w3secretkeys"
-		} else {
+		simpleConfig.KeyType = "w3secretkeys"
+		if len(config.KeyType) != 0 {
 			simpleConfig.KeyType = config.KeyType
 		}
 
 		op_common.RetryMounting()
-		op_common.ProcessConfigKeyPath(config.EncryptedKey, config.KeyType)
+		op_common.ProcessConfigKeyPath(config.EncryptedKey, simpleConfig.KeyType)
 		op_common.UseEncryptedKeys(config.KeyType)
-		key := op_common.GetPrivateKey(config.EncryptedKey, config.KeyType)
+		key := op_common.GetPrivateKey(config.EncryptedKey, simpleConfig.KeyType)
 		if key[0:2] == "0x" {
 			key = key[2:]
 		}
