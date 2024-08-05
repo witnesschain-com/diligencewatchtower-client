@@ -18,10 +18,9 @@ jobs:
 
   Build:
     uses: ./.github/workflows/build_binaries.yml
+    secrets: inherit
     with:
       version: ${{ inputs.watchtower_version }}
-      duser: ${{ secrets.DOCKERHUB_USERNAME }}
-      dtkn: ${{ secrets.DOCKERHUB_TOKEN }}
 
   Create_release:
     runs-on: ubuntu-latest
