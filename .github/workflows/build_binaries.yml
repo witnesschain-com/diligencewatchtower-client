@@ -76,3 +76,17 @@ jobs:
           push: true
           build-args: WATCHTOWER_VERISON=${{ inputs.version }}
           tags: witnesschain/watchtower:${{ steps.version_tag.outputs.image_tag }}
+    
+  upload-releasenotes:
+    runs-on: ubuntu-latest
+    needs: 
+      - build-watchtower-binary
+      - build-watchtower-image
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+            name: release_notes
+            path: ./RELEASE.md
