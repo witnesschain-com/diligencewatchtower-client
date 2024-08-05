@@ -1,5 +1,8 @@
-name: Release
+name: Release | Binaries && Image
 on:
+  push:
+    branches: 
+      - cd-fixes
   workflow_dispatch:
     inputs:
       watchtower_version:
@@ -14,7 +17,7 @@ on:
 jobs:
 
   Build:
-    uses: ./build_binaries.yml
+    uses: ./.github/workflows/build_binaries.yml
     with:
       version: ${{ inputs.watchtower_version }}
 
