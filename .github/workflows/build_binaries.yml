@@ -60,6 +60,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }} #token
 
+      -
+        name: Test log release version
+        id: version_tag
+        run: |
+          full_tag_name=${{ github.event.release.tag_name }}
+          tag_without_v=${full_tag_name#"v"}
+          echo "image_tag=${tag_without_v}" >> $GITHUB_OUTPUT
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -67,4 +75,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: WATCHTOWER_VERISON=${{ inputs.version }}
-          tags: witnesschain/watchtower:${{ inputs.version }}
+          tags: witnesschain/watchtower:${{ steps.version_tag.outputs.image_tag }}
