@@ -7,7 +7,7 @@ This release add support to store keys in [web3 secret storage format](https://e
 In you `watchtower.config.json` file add the `encrypted_key` field with 
 path to they web3 secret storage key file
 ```
-"encrypted_key": /home/ubuntu/.witnesschain/cli/.w3secretkeys/watchtower1.ecdsa.key.json
+"encrypted_key": "/home/ubuntu/.witnesschain/cli/.w3secretkeys/watchtower1.ecdsa.key.json"
 ```
 
 :whale: DockerHub 
