@@ -2,8 +2,11 @@
 	"// ---- This is a template config file for watchtower            " : "-----",
 		"// ---- Please fill the mandatory entries below marked with TODO " : "-----",
 		"// ---- DO NOT Delete any entries in this file                   " : "-----",
+		"encrypted_key_type"                   : "<type of encrypted keys used. e.g. plaintext, gocryptfs, or w3secretkeys>",
+		"private_key"                           : "",    "// TODO" : "plaintext private key of the watchtower if encrypted_key_type is plaintext",
+		"encrypted_key"                        : "",    "// TODO" : "set the private key path+name used for the watchtower key in gocryptfs/w3secretkeys (this is optional)",
+		"" : "if only file name is given, the key will be taken from the default path ~/witnesschain/.gocryptfs/.encrypted_keys or ~/witnesschain/.w3secretkeys)",
 
-		"private_key"                           : "",    "// TODO" : "set the private key for the watchtower",
 
 		"// EXAMPLE"                    : "abcdef0123456789abcdef01234567890abcdef0123456789abcdef012345678",
 		"// How to Generate one?"       : "You may use MetaMask or any other tool to generate one",
@@ -71,9 +74,5 @@
 		"diligence_proof_manager_address"      : "0x7AB3b14F3177935d4539d80289906633615393F2",
 		"operator_registry"                    : "0x26710e60A36Ace8A44e1C3D7B33dc8B80eAb6cb7",
 		"receipt_timeout"                      : 300,
-		"watchtower_retries"                   : 5,
-		"external_signer_endpoint"             : "http://localhost:9000",
-		"encrypted_key_type"                   : "<type of encrypted keys used. e.g. gocryptfs or w3secretkeys>",
-		"encrypted_key"                        : "",    "// TODO" : "set the private key path+name used for the watchtower key in gocryptfs/w3secretkeys (this is optional)",
-		"" : "if only file name is given, the key will be taken from the default path ~/witnesschain/.gocryptfs/.encrypted_keys or ~/witnesschain/.w3secretkeys)",
+		"watchtower_retries"                   : 5
 }
